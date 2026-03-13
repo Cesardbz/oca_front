@@ -1,0 +1,75 @@
+/* Hero Section con fondo de madera/oscuro */
+.services-hero {
+    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                url('/assets/img/servicios/bg-soporte.jpg'); /* Pon tu imagen de fondo aquí */
+    background-size: cover;
+    background-position: center;
+    padding: 80px 0;
+}
+
+/* Divisor debajo del título */
+.divider {
+    width: 60px;
+    height: 3px;
+    background-color: #dee2e6;
+    margin-top: 10px;
+}
+
+/* Estilo de las Tarjetas */
+.service-feature-card {
+    background: #fff;
+    border: 1px solid #f0f0f0;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+    height: 100%;
+}
+
+.service-feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+/* Círculos de los Iconos */
+.icon-circle {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bg-light-pink { background-color: #fff0f3; }
+.bg-light-orange { background-color: #fff8ed; }
+.bg-light-blue { background-color: #edf5ff; }
+
+/* Colores de fondo suaves para los círculos */
+.bg-soft-green  { background-color: #e8f5e9; }
+.bg-soft-cyan   { background-color: #e0f7fa; }
+.bg-soft-purple { background-color: #f3e5f5; }
+.bg-soft-pink   { background-color: #fce4ec; }
+.bg-soft-yellow { background-color: #fffde7; }
+.bg-soft-blue   { background-color: #e3f2fd; }
+
+/* Estilo general de la tarjeta para que se vea como en la imagen */
+.service-feature-card {
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border-radius: 12px;
+    background-color: #ffffff;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+}
+
+.icon-circle {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

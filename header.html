@@ -1,0 +1,160 @@
+<!-- OVERLAY -->
+<div class="overlay" id="overlay"></div>
+
+<!-- MOBILE MENU PANEL -->
+<div class="mobile-menu-panel" id="mobileMenuPanel">
+    <div class="mobile-menu-header">
+        <h4><i class="fas fa-code me-2"></i>Menú</h4>
+        <button class="close-panel" id="closeMobileMenu">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link" href="index.html"><i class="fas fa-home me-2"></i>Inicio</a></li>
+        <li class="nav-item"><a class="nav-link" href="productos.html"><i class="fas fa-box me-2"></i>Productos</a></li>
+        <li class="nav-item dropdown">
+        <li class="nav-item">
+    <a class="nav-link d-flex justify-content-between align-items-center" 
+       data-bs-toggle="collapse" 
+       href="#collapseServicios" 
+       role="button" 
+       aria-expanded="false">
+        <span><i class="fas fa-cogs me-2"></i>Servicios</span>
+        <i class="fas fa-chevron-down small"></i>
+    </a>
+    <div class="collapse" id="collapseServicios">
+    <ul class="navbar-nav ps-4">
+        <li class="nav-item">
+            <a class="nav-link py-1 text-white-50" href="servicios.html">
+                <i class="fas fa-eye me-2 small"></i>Ver Servicios
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link py-1 text-white-50" href="soporte.html">
+                <i class="fas fa-tools me-2 small"></i>Soporte Técnico
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link py-1 text-white-50" href="software.html">
+                <i class="fas fa-laptop-code me-2 small"></i>Software
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link py-1 text-white-50" href="Web.html">
+                <i class="fas fa-globe me-2 small"></i>Páginas Web
+            </a>
+        </li>
+    </ul>
+</div>
+    </li>
+        <li class="nav-item"><a class="nav-link" href="nosotros.html"><i class="fas fa-users me-2"></i>Nosotros</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" id="mobileContactBtn"><i class="fas fa-envelope me-2"></i>Contacto</a></li>
+        <li class="nav-item mt-3">
+            <a class="nav-link btn-login text-center auth-btn" href="login.html" id="mobileLoginBtn" >
+                <i class="fas fa-user me-2"></i>Iniciar Sesión
+            </a>
+        </li>
+    </ul>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark py-3">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">
+            <i class="fas fa-code me-2"></i>OCA Digital Solutions
+        </a>
+        <button class="navbar-toggler" type="button" id="mobileMenuBtn">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>
+                <li class="nav-item"><a class="nav-link" href="productos.html">Productos</a></li>
+                <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Servicios
+                 </a>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="servicesDropdown">
+                 <li><a class="dropdown-item" href="servicios.html"><i class="fas fa-eye me-2"></i>Ver Servicios</a></li>
+                 <li><a class="dropdown-item" href="soporte.html"><i class="fas fa-tools me-2"></i>Soporte Técnico</a></li>
+                 <li><a class="dropdown-item" href="software.html"><i class="fas fa-laptop-code me-2"></i>Software</a></li>
+                 <li><a class="dropdown-item" href="Web.html"><i class="fas fa-globe me-2"></i>Páginas Web</a></li>
+                     </ul>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="nosotros.html">Nosotros</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" id="navContactBtn">Contacto</a></li>
+                <li class="nav-item position-relative">
+                    <a class="nav-link btn-login text-center" href="login.html" id="loginBtn">
+                        <i class="fas fa-user me-2"></i>Iniciar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<!-- FLOATING CONTACT BUTTON -->
+<div class="floating-contact">
+    <div class="contact-options" id="contactOptions">
+        <div class="contact-option whatsapp" id="whatsappBtn">
+            <i class="fab fa-whatsapp"></i>
+            <span>WhatsApp</span>
+        </div>
+        <div class="contact-option email" id="emailBtn">
+            <i class="fas fa-envelope"></i>
+            <span>Mensaje</span>
+        </div>
+    </div>
+    <button class="main-contact-btn" id="mainContactBtn">
+        <i class="fas fa-comment-dots"></i>
+    </button>
+</div>
+
+<!-- CONTACT MODAL -->
+<div class="contact-modal" id="contactModal">
+    <div class="contact-modal-content">
+        <div class="contact-modal-header">
+            <h4><i class="fas fa-paper-plane me-2"></i>Envíanos un Mensaje</h4>
+            <button class="close-panel" id="closeContactModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="contact-modal-body">
+            <form id="contactForm">
+                <div class="mb-3">
+                    <label class="form-label"><i class="fas fa-user me-1"></i>Nombre Completo</label>
+                    <input type="text" class="form-control" placeholder="Tu nombre" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label"><i class="fas fa-envelope me-1"></i>Email</label>
+                    <input type="email" class="form-control" placeholder="tu@email.com" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label"><i class="fas fa-phone me-1"></i>Teléfono</label>
+                    <input type="tel" class="form-control" placeholder="+51 999 999 999">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label"><i class="fas fa-tag me-1"></i>Asunto</label>
+                    <select class="form-control" required>
+                        <option value="">Selecciona una opción</option>
+                        <option value="cotizacion">Solicitar Cotización</option>
+                        <option value="informacion">Información de Productos</option>
+                        <option value="soporte">Soporte Técnico</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label"><i class="fas fa-comment me-1"></i>Mensaje</label>
+                    <textarea class="form-control" id="comentario" rows="4" placeholder="Escribe tu mensaje aquí..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-paper-plane me-2"></i>Enviar Mensaje
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,187 @@
+:root {
+    --primary-blue: #4A90E2;
+}
+
+/* RESET BASE */
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f4f6f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* CONTENEDOR */
+.login-container {
+    width: 100%;
+    max-width: 980px;
+    background: white;
+    border-radius: 18px;
+    display: flex;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+/* PANEL IZQUIERDO */
+.login-info {
+    width: 50%;
+    background: linear-gradient(135deg, var(--primary-blue), #357ABD);
+    color: white;
+    padding: 50px;
+}
+
+.login-info h1 span {
+    font-weight: 800;
+}
+
+.login-info ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 25px;
+}
+
+.login-info li {
+    margin-bottom: 12px;
+}
+
+/* PANEL DERECHO */
+.login-box {
+    width: 50%;
+    padding: 40px;
+}
+
+/* FORMULARIOS */
+.form {
+    display: none;
+}
+
+.form.active {
+    display: block;
+}
+
+/* INPUTS */
+.input-group {
+    position: relative;
+    margin-bottom: 18px;
+}
+
+.input-group i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px 12px 45px;
+    border-radius: 25px;
+    border: 1px solid #ddd;
+    outline: none;
+}
+
+.input-group input:focus {
+    border-color: var(--primary-blue);
+}
+
+/* BOTONES */
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    border-radius: 25px;
+    border: none;
+    background: linear-gradient(135deg, var(--primary-blue), #357ABD);
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    opacity: 0.95;
+}
+
+/* SWITCH */
+.switch {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 0.9rem;
+}
+
+.switch a {
+    color: var(--primary-blue);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* TOAST */
+.toast {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    background: #333;
+    color: white;
+    padding: 14px 22px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.4s ease;
+    z-index: 2000;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast.success {
+    background: linear-gradient(135deg, #28a745, #218838);
+}
+
+.toast.error {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+
+/* TABLET */
+@media (max-width: 900px) {
+    .login-container {
+        flex-direction: column;
+    }
+
+    .login-info,
+    .login-box {
+        width: 100%;
+    }
+
+    .login-info {
+        text-align: center;
+    }
+}
+
+/* MÓVIL */
+@media (max-width: 480px) {
+
+    body {
+        padding: 15px;
+    }
+
+    .login-info {
+        padding: 30px 20px;
+    }
+
+    .login-box {
+        padding: 30px 20px;
+    }
+
+    .login-info h1 {
+        font-size: 1.4rem;
+    }
+}

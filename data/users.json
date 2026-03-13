@@ -1,0 +1,8 @@
+[
+    {
+        "id": 1,
+        "nombre": "Admin OCA",
+        "email": "admin@ocaweb.com",
+        "password": "123456"
+    }
+]

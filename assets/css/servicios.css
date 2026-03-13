@@ -1,0 +1,492 @@
+/* ===================================
+   CONFIGURACIÓN BASE Y VARIABLES
+   =================================== */
+:root {
+    --primary-blue: #4A90E2;    /* OCA Azul Primario */
+    --secondary-blue: #357ABD;  /* OCA Azul Secundario */
+    --primary-dark: #1a1a1a;
+    --secondary-dark: #2d2d2d;
+    --text-light: #ffffff;
+    --text-muted: #b0b0b0;
+    --card-bg: #fff;            /* Pasamos cards a blanco para limpiar el diseño B2B */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    background-color: #f8f9fa; /* Fondo gris súper claro */
+    overflow-x: hidden;
+}
+
+/* ===================================
+   HEADER / HERO SECTION
+   =================================== */
+.page-header {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+    padding: 180px 0 100px; /* Mas espacio arriba por el navbar fixed */
+    color: var(--text-light);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+
+.header-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.header-particles::before,
+.header-particles::after {
+    content: '';
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(74, 144, 226, 0.15) 0%, transparent 70%); /* Ajustado al AZUL OCA */
+    animation: float 20s ease-in-out infinite;
+}
+
+.header-particles::before { top: -100px; left: -100px; animation-delay: 0s; }
+.header-particles::after { bottom: -100px; right: -100px; animation-delay: 10s; }
+
+@keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(50px, 50px) scale(1.1); }
+}
+
+.page-header-content { position: relative; z-index: 1; }
+
+.page-header h1 {
+    font-weight: 800;
+    margin-bottom: 1rem;
+    letter-spacing: -1px;
+}
+
+.page-header .lead {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* ===================================
+   SECCIÓN DE SERVICIOS - CARDS CORPORATIVAS
+   =================================== */
+.services-section {
+    padding: 100px 0;
+}
+
+.section-title {
+    color: #1a1a1a;
+    font-weight: 800;
+    font-size: 2.5rem;
+    margin-bottom: 4rem;
+    position: relative;
+    display: inline-block;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 5px;
+    background: linear-gradient(90deg, var(--primary-blue), var(--secondary-blue));
+    border-radius: 5px;
+}
+
+/* Rediseño The Service Card (Antes Team Card) */
+.service-card-premium {
+    position: relative;
+    border-radius: 20px; /* Bordes amigables de app moderna */
+    background: var(--card-bg);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05); /* Sombra suave */
+    transition: var(--transition-smooth);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+.service-card-premium:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 50px rgba(74, 144, 226, 0.15); /* Brillo azul al hover */
+}
+
+.service-card-image {
+    position: relative;
+    width: 100%;
+    height: 240px;
+    overflow: hidden;
+}
+
+.service-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.service-card-premium:hover .service-card-image img {
+    transform: scale(1.1); /* Efecto Zoom en imagen */
+}
+
+/* Overlay sutil */
+.service-card-image::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.3) 0%, transparent 100%);
+}
+
+.service-card-body {
+    padding: 30px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.service-card-body h4 {
+    color: #1a1a1a;
+    font-weight: 700;
+    margin-bottom: 15px;
+    font-size: 1.25rem;
+}
+
+.service-card-body p {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    flex-grow: 1;
+}
+
+.service-btn {
+    align-self: flex-start;
+    color: var(--primary-blue);
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.95rem;
+    padding: 10px 20px;
+    border-radius: 50px;
+    background: rgba(74, 144, 226, 0.1);
+    transition: all 0.3s ease;
+}
+
+.service-card-premium:hover .service-btn {
+    background: var(--primary-blue);
+    color: #fff;
+    transform: translateX(10px);
+}
+
+.service-btn i {
+    margin-left: 8px;
+    transition: transform 0.3s ease;
+}
+
+.service-card-premium:hover .service-btn i {
+    transform: translateX(5px);
+}
+
+/* ===================================
+   NUEVA SECCIÓN: NUESTRO PROCESO (LINEA DE TIEMPO / 4 PASOS)
+   =================================== */
+.process-section {
+    padding: 80px 0;
+    background: #fff;
+}
+
+.process-step {
+    text-align: center;
+    position: relative;
+    padding: 20px;
+    z-index: 1;
+}
+
+/* Línea conectora entre pasos (Solo pantallas lg o md) */
+@media (min-width: 768px) {
+    .process-step::after {
+        content: '';
+        position: absolute;
+        top: 60px; /* A la mitad del círculo */
+        right: -50%;
+        width: 100%;
+        height: 2px;
+        background: rgba(74, 144, 226, 0.2);
+        z-index: -1;
+    }
+    .col-md-3:last-child .process-step::after {
+        display: none; /* Quitamos la línea del último paso */
+    }
+}
+
+.process-icon-box {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    background: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--primary-blue);
+    box-shadow: 0 10px 30px rgba(74, 144, 226, 0.2);
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.process-step:hover .process-icon-box {
+    background: var(--primary-blue);
+    color: #fff;
+    transform: translateY(-10px);
+}
+
+.process-step h5 {
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 10px;
+}
+
+.process-step p {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* ===================================
+   SECCIÓN DE TECNOLOGÍAS (OPTIMIZADA AL COLOR OCA)
+   =================================== */
+.tech-universe-section {
+    padding: 100px 0;
+    background: linear-gradient(135deg, #111 0%, #1a1a1a 100%); /* Fondo oscuro premium */
+    position: relative;
+    overflow: hidden;
+}
+
+/* Patrón Grid de fondo unificado a Azul OCA */
+.tech-universe-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(74, 144, 226, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74, 144, 226, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.8;
+}
+
+.tech-text-content {
+    position: relative;
+    z-index: 2;
+}
+
+.tech-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+}
+
+.tech-description {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+}
+
+/* Stats */
+.tech-stats {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary-blue); /* Ajuste OCA Blue */
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* VISUALIZACIÓN 3D CON CSS PURO (COLORES BLUE OCA) */
+.tech-visualization {
+    position: relative;
+    min-height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1200px;
+}
+
+.tech-sphere {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    transform-style: preserve-3d;
+}
+
+.tech-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.center-icon {
+    font-size: 3rem;
+    color: var(--primary-blue); /* Color OCA */
+    z-index: 2;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.pulse-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    border: 2px solid var(--primary-blue);
+    border-radius: 50%;
+    animation: pulseRing 2s ease-out infinite;
+    opacity: 0;
+}
+.pulse-ring.delay-1 { animation-delay: 0.6s; }
+.pulse-ring.delay-2 { animation-delay: 1.2s; }
+
+@keyframes pulseRing {
+    0% { width: 100px; height: 100px; opacity: 0.8; }
+    100% { width: 220px; height: 220px; opacity: 0; }
+}
+
+/* Órbitas */
+.tech-orbit {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 50%;
+    left: 50%;
+    transform-style: preserve-3d;
+}
+
+.orbit-1 { animation: rotateOrbit 25s linear infinite; }
+.orbit-2 { animation: rotateOrbit 20s linear infinite reverse; }
+
+@keyframes rotateOrbit {
+    from { transform: translate(-50%, -50%) rotateY(0deg); }
+    to { transform: translate(-50%, -50%) rotateY(360deg); }
+}
+
+/* Iconos orbitantes */
+.tech-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80px;
+    height: 80px;
+    background: rgba(30,30,35,0.9);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(74, 144, 226, 0.4);
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    color: var(--text-light);
+    transform-origin: center;
+    transform: translate(-50%, -50%) rotateY(var(--angle)) translateZ(240px);
+    transition: var(--transition-smooth);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    will-change: transform;
+}
+
+.tech-icon.small {
+    width: 60px;
+    height: 60px;
+    transform: translate(-50%, -50%) rotateY(var(--angle)) translateZ(160px);
+}
+
+.tech-icon:hover {
+    border-color: var(--primary-blue);
+    background: rgba(74, 144, 226, 0.15);
+}
+
+.tech-icon i {
+    font-size: 2rem;
+    color: var(--text-light);
+    animation: counterRotate 25s linear infinite;
+}
+
+.tech-icon.small i {font-size: 1.5rem;}
+.tech-icon span {
+    font-size: 0.70rem;
+    font-weight: 500;
+    color: var(--text-light);
+    animation: counterRotate 25s linear infinite;
+}
+
+@keyframes counterRotate {
+    from { transform: rotateY(0deg); }
+    to { transform: rotateY(-360deg); }
+}
+
+/* ===================================
+   RESPONSIVE DESIGN (Solo lo esencial)
+   =================================== */
+@media (max-width: 992px) {
+    .page-header { padding: 140px 0 60px; }
+    .tech-text-content { text-align: center; margin-bottom: 50px; }
+    .tech-stats { justify-content: center; }
+    .tech-sphere { width: 400px; height: 400px; }
+    .tech-icon { transform: translate(-50%, -50%) rotateY(var(--angle)) translateZ(180px); }
+}
+
+@media (max-width: 768px) {
+    .section-title { font-size: 2rem; }
+    .service-card-image { height: 200px; }
+    .process-step::after { display: none; } /* Ocultar lineas conectoras en móviles */
+    .process-step { margin-bottom: 30px; }
+    .tech-sphere { width: 300px; height: 300px; }
+    .tech-icon {
+        width: 60px; height: 60px;
+        transform: translate(-50%, -50%) rotateY(var(--angle)) translateZ(140px);
+        font-size: 0.6rem;
+    }
+}

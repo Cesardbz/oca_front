@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ofertas de Software - OCA Digital Solutions</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/index.css">
+    <link rel="stylesheet" href="assets/css/servicios.css">
+    <link rel="stylesheet" href="assets/css/software.css">
+</head>
+<body>
+    <div id="header-components"></div>
+
+    <section class="page-header">
+        <div class="header-particles"></div>
+        <div class="container page-header-content text-center">
+            <h1 class="display-3 fw-bold mb-3 animate-fade-in">Ofertas De Software</h1>
+            <p class="lead mb-4 animate-fade-in-delay">Sistemas profesionales listos para implementarse en tu negocio</p>
+            <nav aria-label="breadcrumb" class="animate-fade-in-delay">
+                <ol class="breadcrumb justify-content-center bg-transparent p-0">
+                    <li class="breadcrumb-item">
+                        <a href="index.html" class="text-white-50 text-decoration-none">Home</a>
+                    </li>
+                    <li class="breadcrumb-item active text-white" aria-current="page">
+                        Ofertas
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </section>
+
+    <section class="container my-5 py-4">
+        <div class="text-center mb-5">
+            <p class="text-muted mb-4">Adquiere sistemas base robustos y escalables a precios sumamente accesibles para dar el salto digital.</p>
+            <div class="search-container mx-auto" style="max-width: 500px;">
+                <label class="fw-bold mb-2 text-dark">¿Qué sistema estás buscando? <i class="fas fa-search ms-1 text-primary"></i></label>
+                <input type="text" class="form-control search-input text-center" placeholder="Ej: Sistema de Préstamos, Inventario...">
+            </div>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            
+            <!-- Software 1 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="software-card">
+                    <div class="software-image-container">
+                        <span class="badge-oferta"><i class="fas fa-tag me-1"></i>¡OFERTA!</span>
+                        <img src="assets/img/servicios/web.png" alt="Sistema de Préstamos" class="img-fluid main-software-img">
+                    </div>
+                    <div class="card-body-content text-center">
+                        <h5 class="card-title-soft">Sistema de Préstamos</h5>
+                        <div class="tech-icons">
+                            <i class="fab fa-php text-primary" title="PHP"></i>
+                            <i class="fab fa-js text-warning" title="JavaScript"></i>
+                            <i class="fab fa-bootstrap text-purple" title="Bootstrap"></i>
+                            <i class="fas fa-database text-info" title="MySQL"></i>
+                        </div>
+                        <p class="mb-1"><span class="price-offer">S/. 272.50 PEN</span></p>
+                        <p class="price-original small text-decoration-line-through">Antes: S/. 410.00 PEN</p>
+                        <p class="small text-muted mb-4"><i class="fas fa-download text-success"></i> +9 Descargas</p>
+                        
+                        <div class="mt-auto d-flex flex-column gap-2">
+                            <button class="btn btn-comprar-oca w-100" onclick="solicitarSoftware('Sistema de Préstamos', '272.50')">
+                                Comprar Ahora <i class="fas fa-credit-card ms-1"></i>
+                            </button>
+                            <a href="#" class="btn btn-detalles-oca w-100">Ver Demo Técnica</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Software 2 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="software-card">
+                    <div class="software-image-container">
+                        <span class="badge-oferta"><i class="fas fa-tag me-1"></i>¡OFERTA!</span>
+                        <img src="assets/img/servicios/web.png" alt="Tienda Online Básico 2" class="img-fluid main-software-img">
+                    </div>
+                    <div class="card-body-content text-center">
+                        <h5 class="card-title-soft">Tienda Online (Básico 2)</h5>
+                        <div class="tech-icons">
+                            <i class="fab fa-php text-primary" title="PHP"></i>
+                            <i class="fab fa-js text-warning" title="JavaScript"></i>
+                            <i class="fab fa-html5 text-danger" title="HTML5"></i>
+                        </div>
+                        <p class="mb-1"><span class="price-offer">S/. 272.50 PEN</span></p>
+                        <p class="price-original small text-decoration-line-through">Antes: S/. 410.00 PEN</p>
+                        <p class="small text-muted mb-4"><i class="fas fa-download text-success"></i> +11 Descargas</p>
+                        
+                        <div class="mt-auto d-flex flex-column gap-2">
+                            <button class="btn btn-comprar-oca w-100" onclick="solicitarSoftware('Tienda Online Básico 2', '272.50')">
+                                Comprar Ahora <i class="fas fa-credit-card ms-1"></i>
+                            </button>
+                            <a href="#" class="btn btn-detalles-oca w-100">Ver Demo Técnica</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Software 3 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="software-card">
+                    <div class="software-image-container">
+                        <span class="badge-oferta"><i class="fas fa-tag me-1"></i>¡OFERTA!</span>
+                        <img src="assets/img/servicios/web.png" alt="Sistema de Inventario 3.0" class="img-fluid main-software-img">
+                    </div>
+                    <div class="card-body-content text-center">
+                        <h5 class="card-title-soft">Sistema De Inventario 3.0</h5>
+                        <div class="tech-icons">
+                            <i class="fab fa-laravel text-danger" title="Laravel"></i>
+                            <i class="fab fa-vuejs text-success" title="Vue JS"></i>
+                            <i class="fas fa-database text-info" title="SQL"></i>
+                        </div>
+                        <p class="mb-1"><span class="price-offer">S/. 272.50 PEN</span></p>
+                        <p class="price-original small text-decoration-line-through">Antes: S/. 410.00 PEN</p>
+                        <p class="small text-muted mb-4"><i class="fas fa-download text-success"></i> +10 Descargas</p>
+                        
+                        <div class="mt-auto d-flex flex-column gap-2">
+                            <button class="btn btn-comprar-oca w-100" onclick="solicitarSoftware('Sistema De Inventario 3.0', '272.50')">
+                                Comprar Ahora <i class="fas fa-credit-card ms-1"></i>
+                            </button>
+                            <a href="#" class="btn btn-detalles-oca w-100">Ver Demo Técnica</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- Footer Dinámico -->
+    <div id="footer-components"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Cargar header
+        fetch('header.html')
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById('header-components').innerHTML = data;
+
+                // Cargar common.js después del header
+                const script = document.createElement('script');
+                script.src = 'assets/js/common.js';
+                script.defer = true;
+                document.body.appendChild(script);
+            });
+
+        // Cargar footer
+        fetch('footer.html')
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById('footer-components').innerHTML = data;
+            });
+
+        // Función de autocompletado para compras de software
+        function solicitarSoftware(nombreSistema, precio) {
+            const modal = document.getElementById('contactModal');
+            if(modal) {
+                // Abre el modal de contacto implementado en el header (common.css)
+                modal.classList.add('active');
+                
+                // Pre-selecciona "cotizacion" para indicar intención de compra o consulta de ventas
+                const selectAsunto = document.querySelector('#contactForm select');
+                if(selectAsunto) selectAsunto.value = 'cotizacion';
+                
+                // Autocompleta el campo con un texto amistoso y directo a la venta
+                const textArea = document.getElementById('comentario');
+                if(textArea) {
+                    textArea.value = `¡Hola! Estoy muy interesado en adquirir el "${nombreSistema}" que está en oferta por S/. ${precio} PEN. Me gustaría saber cuáles son los métodos de pago y de entrega. Quedo atento.`;
+                }
+            } else {
+                console.warn('El formulario de contacto aún no ha cargado');
+            }
+        }
+    </script>
+</body>
+</html>

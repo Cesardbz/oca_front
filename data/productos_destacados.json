@@ -1,0 +1,23 @@
+[
+    {
+        "titulo": "Sistema de Asistencia con QR",
+        "descripcion": "Control rápido y seguro para escuelas y empresas.",
+        "imagen": "assets/img/productos/imagen1.png",
+        "icono": "fas fa-qrcode",
+        "enlace": "productos.html"
+    },
+    {
+        "titulo": "Tienda Online",
+        "descripcion": "E-commerce completo con pasarela de pagos integrada.",
+        "imagen": "assets/img/productos/imagen1.png",
+        "icono": "fas fa-shopping-cart",
+        "enlace": "productos.html"
+    },
+    {
+        "titulo": "Sistema de Gestión",
+        "descripcion": "Software personalizado para administrar tu negocio.",
+        "imagen": "assets/img/productos/imagen1.png",
+        "icono": "fas fa-chart-line",
+        "enlace": "productos.html"
+    }
+]

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soporte Técnico - OCA Digital Solutions</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/index.css">
+    <link rel="stylesheet" href="assets/css/servicios.css">
+    <link rel="stylesheet" href="assets/css/soporte.css">
+</head>
+<body>
+    <div id="header-components"></div>
+   <section class="page-header">
+    <div class="header-particles"></div>
+    
+    <div class="container page-header-content text-center">
+        <h1 class="display-3 fw-bold mb-3 animate-fade-in">Servicios Tecnológicos</h1>
+        
+        <p class="lead mb-4 animate-fade-in-delay">Soluciones digitales listas para potenciar tu negocio</p>
+        
+        <nav aria-label="breadcrumb" class="animate-fade-in-delay">
+            <ol class="breadcrumb justify-content-center bg-transparent p-0">
+                <li class="breadcrumb-item">
+                    <a href="index.html" class="text-white-50 text-decoration-none">Home</a>
+                </li>
+                <li class="breadcrumb-item active text-white" aria-current="page">
+                    Soporte Técnico
+                </li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<section class="container my-5 py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Soporte Técnico</h2>
+        <div class="divider mx-auto"></div>
+        <p class="text-muted mt-3 mx-auto" style="max-width: 700px;">
+            En esta sección, te proporcionaremos una breve descripción de nuestros servicios de soporte técnico para <strong>dispositivos</strong> como laptops, PC o celulares.
+        </p>
+    </div>
+
+    <!-- Primera Fila -->
+    <div class="row g-4 justify-content-center">
+        <div class="col-md-4">
+            <div class="service-feature-card text-center p-4 d-flex flex-column h-100">
+                <div class="icon-circle mx-auto mb-4 bg-light-pink">
+                    <i class="far fa-file-word text-danger fs-3"></i>
+                </div>
+                <h4>Licencias Office</h4>
+                <p class="text-muted flex-grow-1">Accede a las herramientas de Microsoft Office con nuestras licencias originales y actualizadas.</p>
+                <button class="btn btn-outline-dark w-100 rounded-pill mt-3 fw-bold" onclick="solicitarSoporte('Licencias Office')">
+                    <i class="fas fa-headset me-2"></i>Solicitar Soporte
+                </button>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="service-feature-card text-center p-4 d-flex flex-column h-100">
+                <div class="icon-circle mx-auto mb-4 bg-light-orange">
+                    <i class="fab fa-windows text-warning fs-3"></i>
+                </div>
+                <h4>Licencias de Windows</h4>
+                <p class="text-muted flex-grow-1">Garantiza la estabilidad de tu sistema operativo con nuestras licencias genuinas de Microsoft Windows.</p>
+                <button class="btn btn-outline-dark w-100 rounded-pill mt-3 fw-bold" onclick="solicitarSoporte('Licencias de Windows')">
+                    <i class="fas fa-headset me-2"></i>Solicitar Soporte
+                </button>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="service-feature-card text-center p-4 d-flex flex-column h-100">
+                <div class="icon-circle mx-auto mb-4 bg-light-blue">
+                    <i class="fab fa-windows text-primary fs-3"></i>
+                </div>
+                <h4>Instalacion de Windows</h4>
+                <p class="text-muted flex-grow-1">Actualiza tu sistema operativo con nuestra instalación profesional de Windows.</p>
+                <button class="btn btn-outline-dark w-100 rounded-pill mt-3 fw-bold" onclick="solicitarSoporte('Instalación de Windows')">
+                    <i class="fas fa-headset me-2"></i>Solicitar Soporte
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <br>
+    
+    <!-- Segunda Fila -->
+    <div class="row g-4 justify-content-center">
+        <div class="col-md-4">
+            <div class="service-feature-card text-center p-4 d-flex flex-column h-100">
+                <div class="icon-circle mx-auto mb-4 bg-soft-green">
+                    <i class="far fa-file-excel text-success fs-3"></i>
+                </div>
+                <h5 class="fw-bold">Instalación paquetería Office</h5>
+                <p class="text-muted small flex-grow-1">Deja que nuestros expertos instalen y configuren Microsoft Office en tu dispositivo.</p>
+                <button class="btn btn-outline-dark w-100 rounded-pill mt-3 fw-bold btn-sm" onclick="solicitarSoporte('Instalación de Paquetería Office')">
+                    <i class="fas fa-headset me-2"></i>Solicitar Soporte
+                </button>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="service-feature-card text-center p-4 d-flex flex-column h-100">
+                <div class="icon-circle mx-auto mb-4 bg-soft-cyan">
+                    <i class="fas fa-microchip text-info fs-3"></i>
+                </div>
+                <h5 class="fw-bold">Actualización de Hardware</h5>
+                <p class="text-muted small flex-grow-1">Mejora el rendimiento y capacidad de tu dispositivo con cambio de disco duro, RAM o batería.</p>
+                <button class="btn btn-outline-dark w-100 rounded-pill mt-3 fw-bold btn-sm" onclick="solicitarSoporte('Actualización de Hardware')">
+                    <i class="fas fa-headset me-2"></i>Solicitar Soporte
+                </button>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="service-feature-card text-center p-4 d-flex flex-column h-100">
+                <div class="icon-circle mx-auto mb-4 bg-soft-purple">
+                    <i class="fas fa-rocket text-secondary fs-3" style="color: #6f42c1 !important;"></i>
+                </div>
+                <h5 class="fw-bold">Instalación de programas</h5>
+                <p class="text-muted small flex-grow-1">Personaliza tu dispositivo con la instalación de programas específicos según tus necesidades.</p>
+                <button class="btn btn-outline-dark w-100 rounded-pill mt-3 fw-bold btn-sm" onclick="solicitarSoporte('Instalación de Programas')">
+                    <i class="fas fa-headset me-2"></i>Solicitar Soporte
+                </button>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="service-feature-card text-center p-4 d-flex flex-column h-100">
+                <div class="icon-circle mx-auto mb-4 bg-soft-pink">
+                    <i class="fas fa-mobile-alt text-danger fs-3"></i>
+                </div>
+                <h5 class="fw-bold">Desbloqueo de celulares</h5>
+                <p class="text-muted small flex-grow-1">Recupera el acceso a tu dispositivo móvil para cuentas Google, PIN o Patrón.</p>
+                <button class="btn btn-outline-dark w-100 rounded-pill mt-3 fw-bold btn-sm" onclick="solicitarSoporte('Desbloqueo de Celulares')">
+                    <i class="fas fa-headset me-2"></i>Solicitar Soporte
+                </button>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="service-feature-card text-center p-4 d-flex flex-column h-100">
+                <div class="icon-circle mx-auto mb-4 bg-soft-yellow">
+                    <i class="far fa-calendar-alt text-warning fs-3"></i>
+                </div>
+                <h5 class="fw-bold">Citas en el SAT</h5>
+                <p class="text-muted small flex-grow-1">Programamos citas en el SAT para trámites fiscales como RFC y eFirma.</p>
+                <button class="btn btn-outline-dark w-100 rounded-pill mt-3 fw-bold btn-sm" onclick="solicitarSoporte('Citas en el SAT')">
+                    <i class="fas fa-headset me-2"></i>Solicitar Soporte
+                </button>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="service-feature-card text-center p-4 d-flex flex-column h-100">
+                <div class="icon-circle mx-auto mb-4 bg-soft-blue">
+                    <i class="fas fa-laptop text-primary fs-3"></i>
+                </div>
+                <h5 class="fw-bold">Limpieza de equipos</h5>
+                <p class="text-muted small flex-grow-1">Mantén tus dispositivos en óptimas condiciones con nuestra limpieza profesional.</p>
+                <button class="btn btn-outline-dark w-100 rounded-pill mt-3 fw-bold btn-sm" onclick="solicitarSoporte('Limpieza de Equipos')">
+                    <i class="fas fa-headset me-2"></i>Solicitar Soporte
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <div id="footer-components"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Cargar header
+        fetch('header.html')
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById('header-components').innerHTML = data;
+
+                // Lista de scripts a cargar después del header
+                const scriptsToLoad = [
+                    'assets/js/common.js'
+                ];
+
+                scriptsToLoad.forEach(src => {
+                    const script = document.createElement('script');
+                    script.src = src;
+                    script.defer = true;
+                    document.body.appendChild(script);
+                });
+            });
+
+        // Cargar footer
+        fetch('footer.html')
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById('footer-components').innerHTML = data;
+            });
+
+        // Lógica de Solicitud de Soporte
+        function solicitarSoporte(nombreServicio) {
+            // Esperar que common.js cargue y exista contactModal
+            const modal = document.getElementById('contactModal');
+            if(modal) {
+                // Abre el modal usando la misma lógica de common.js
+                modal.classList.add('active');
+                
+                // Pre-selecciona Soporte Técnico en el Select
+                const selectAsunto = document.querySelector('#contactForm select');
+                if(selectAsunto) selectAsunto.value = 'soporte';
+                
+                // Autocompleta el campo de texto con el servicio clickeado
+                const textArea = document.getElementById('comentario');
+                if(textArea) {
+                    textArea.value = `Hola, me gustaría solicitar el servicio de "${nombreServicio}". Por favor contáctenme para más detalles.`;
+                }
+            } else {
+                console.warn('El formulario de contacto aún no ha cargado');
+            }
+        }
+    </script>
+</body>
+</html>

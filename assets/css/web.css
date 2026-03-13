@@ -1,0 +1,270 @@
+/* =======================================
+   1. HERO Y ESTRUCTURA BÁSICA
+   ======================================= */
+.web-hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                url('../img/bg-hero-dark.jpg');
+    background-size: cover;
+    background-position: center;
+    padding: 80px 0;
+    margin-bottom: -50px;
+}
+
+/* Caja de información ("Confiar en OCA") que resalta */
+.info-section .row {
+    background-color: #ffffff;
+    border-radius: 20px !important;
+    position: relative;
+    z-index: 10;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.04) !important;
+}
+
+.info-section h2 {
+    color: #1a1a1a;
+    font-size: 2rem;
+    position: relative;
+    font-weight: 800;
+}
+
+.leading-relaxed {
+    line-height: 1.8;
+    font-size: 1.05rem;
+    text-align: justify;
+    color: #555;
+}
+
+.info-section img {
+    max-width: 90%;
+    filter: drop-shadow(0 15px 25px rgba(0,0,0,0.1));
+    border-radius: 60px !important; /* Bordes altamente redondeados tipo óvalo horizontal */
+    object-fit: cover;
+    aspect-ratio: 4/3; /* Para forzar un óvalo agradable */
+}
+
+/* =======================================
+   2. SECCIÓN DE PRECIOS B2B (PRICING)
+   ======================================= */
+.pricing-section {
+    background-color: #f8f9fa; /* Fondo claro corporativo */
+    padding-top: 100px;
+    padding-bottom: 80px;
+}
+
+.pricing-section h2 {
+    color: #1a1a1a !important; /* Texto Oscuro en fondo claro */
+}
+
+.pricing-section p {
+    color: #666 !important;
+}
+
+.header-line {
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(135deg, var(--primary-blue) 0%, #357ABD 100%);
+    margin-top: 15px;
+    border-radius: 2px;
+}
+
+/* Base de Tarjeta Flexbox */
+.plan-card {
+    border-radius: 20px;
+    padding: 40px 30px;
+    text-align: center;
+    border: 1px solid rgba(0,0,0,0.05);
+    height: 100%;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff; /* Cajas por defecto Blanca (Glass limplio) */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    position: relative;
+    overflow: hidden;
+}
+
+.plan-card:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 20px 40px rgba(74, 144, 226, 0.1);
+}
+
+/* =======================================
+   3. COLORES DE PLANES (HIGHLIGHTING)
+   ======================================= */
+.plan-basico h3, .plan-ecommerce h3 {
+    color: #333 !important;
+    font-weight: 800;
+}
+
+/* PLAN ESTRELLA (Profesional Medio) */
+.plan-profesional { 
+    background: linear-gradient(135deg, var(--primary-blue) 0%, #3a75bb 100%); 
+    transform: scale(1.05); /* Ligeramente más grande */
+    box-shadow: 0 15px 40px rgba(74, 144, 226, 0.3);
+    border: none;
+    z-index: 2;
+}
+
+.plan-profesional:hover {
+    transform: scale(1.05) translateY(-10px);
+    box-shadow: 0 25px 50px rgba(74, 144, 226, 0.4);
+}
+
+.plan-profesional h3, 
+.plan-profesional .price, 
+.plan-profesional p, 
+.plan-profesional .plan-features li {
+    color: #ffffff !important;
+}
+
+.plan-profesional .regular-price {
+    color: rgba(255,255,255,0.7) !important;
+}
+
+/* =======================================
+   4. TIPOGRAFÍA DE PRECIOS
+   ======================================= */
+.plan-card .price {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-top: 15px;
+    color: #1a1a1a;
+}
+
+.regular-price {
+    font-size: 0.85rem;
+    color: #999;
+    margin-bottom: 30px;
+    text-decoration: line-through;
+}
+
+/* =======================================
+   5. LISTADO DE CARACTERÍSTICAS
+   ======================================= */
+.plan-features {
+    list-style: none;
+    padding: 0;
+    text-align: left; /* Alineado a la izquierda luce más pro */
+    margin-bottom: 35px;
+    flex-grow: 1; 
+}
+
+.plan-features li {
+    font-size: 1rem;
+    margin-bottom: 12px;
+    color: #555;
+    display: flex;
+    align-items: center;
+}
+
+.plan-features li i {
+    font-size: 0.85rem;
+    margin-right: 10px;
+    color: var(--primary-blue);
+    background: rgba(74, 144, 226, 0.1);
+    padding: 5px;
+    border-radius: 50%;
+}
+
+.plan-profesional .plan-features li i {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* =======================================
+   6. BOTONES (CTA)
+   ======================================= */
+.btn-plan {
+    width: 100%;
+    border-radius: 50px;
+    padding: 14px;
+    font-weight: bold;
+    font-size: 0.95rem;
+    border: 2px solid var(--primary-blue);
+    background: transparent;
+    color: var(--primary-blue);
+    transition: all 0.3s ease;
+    margin-top: auto; 
+}
+
+.btn-plan:hover {
+    background: var(--primary-blue);
+    color: #fff !important;
+    box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+}
+
+/* Botón Invertido para el Plan Estrella */
+.plan-profesional .btn-plan {
+    background: #ffffff;
+    color: var(--primary-blue) !important;
+    border: none;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.plan-profesional .btn-plan:hover {
+    background: #f8f9fa;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+/* =======================================
+   7. BADGE "POPULAR"
+   ======================================= */
+.badge-popular {
+    position: absolute;
+    top: 25px;
+    right: -35px;
+    background: #ffeaa7; /* Dorado sutil */
+    color: #d35400; /* Texto oscuro/naranja intenso */
+    font-size: 0.75rem;
+    padding: 8px 40px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    transform: rotate(45deg);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* =======================================
+   8. RESPONSIVE (MÓVILES)
+   ======================================= */
+@media (max-width: 768px) {
+    /* Centrado de la sección 'Por qué confiar' */
+    .info-section .col-lg-6 {
+        text-align: center !important;
+    }
+    
+    .info-section .list-unstyled {
+        justify-content: center !important;
+        flex-direction: column;
+        gap: 1.5rem !important;
+        margin-top: 1rem;
+    }
+
+    /* Reducción de relleno en tarjetas para evitar desbordes */
+    .plan-card {
+        padding: 30px 20px;
+    }
+
+    /* Asegurar que las tarjetas no rompan el ancho en móviles */
+    .pricing-section .row {
+        gap: 20px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    /* Desactivar el scale() grande en móvil del plan profesional para que no corte la pantalla */
+    .plan-profesional {
+        transform: scale(1);
+    }
+    
+    .plan-profesional:hover {
+        transform: translateY(-5px);
+    }
+    
+    /* El badge debe acomodarse un poco para no salirse de la caja */
+    .badge-popular {
+        right: -45px;
+        padding: 5px 45px;
+    }
+}

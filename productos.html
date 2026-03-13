@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Nosotros - OCA Digital Solutions</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" href="assets/css/common.css">
+        <link rel="stylesheet" href="/assets/css/index.css">
+        <link rel="stylesheet" href="/assets/css/productos.css">
+    </head>
+    <body>
+    <div id="header-components"></div>
+    <main id="main-content">
+        <!-- ===================== -->
+        <!-- SECCIÓN PRODUCTOS -->
+        <!-- ===================== -->
+        <section id="portfolio" class="py-5 bg-light">
+            <div class="container">
+        
+                <!-- TÍTULO -->
+                <div class="section-header">
+                    <h2 class="section-title">Nuestros Productos</h2>
+                    <p class="text-muted mt-2">
+                        Soluciones digitales desarrolladas por OCA para potenciar tu negocio
+                    </p>
+                </div>
+        
+                <!-- FILTROS -->
+                <ul id="portfolio-flters">
+                    <li class="filter-active" data-filter="all">Todos</li>
+                    <li data-filter="sistemas">Sistemas Empresariales</li>
+                    <li data-filter="web">Diseño Web</li>
+                    <li data-filter="movil">Apps Móviles</li>
+                </ul>
+        
+                <!-- CONTENEDOR DE PRODUCTOS -->
+                <div class="row portfolio-container" id="products-container">
+                    <!-- 🔹 Los productos se insertan aquí por JS -->
+                </div>
+        
+                <!-- BOTÓN VER MÁS -->
+                <div class="text-center mt-4" id="load-more-container" style="display: none;">
+                    <button class="btn-load-more" id="load-more-btn">
+                        Ver más
+                    </button>
+                </div>
+        
+            </div>
+        </section>
+        
+        <!-- ===================== -->
+        <!-- LIGHTBOX IMAGEN -->
+        <!-- ===================== -->
+        <div id="custom-lightbox" class="custom-lightbox">
+            <span class="lightbox-close">&times;</span>
+            <img id="lightbox-img" class="lightbox-content" alt="Imagen ampliada">
+            <div id="lightbox-caption"></div>
+        </div>
+        
+        <!-- ===================== -->
+        <!-- MODAL DETALLES -->
+        <!-- ===================== -->
+        <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+        
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalTitle">Detalle del producto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+        
+                    <div class="modal-body">
+                        <p id="modalDescription">
+                            <!-- descripción dinámica -->
+                        </p>
+        
+                        <!-- VIDEO (luego vendrá desde BD) -->
+                        <div class="ratio ratio-16x9 mt-3">
+                            <iframe id="modalVideo" src="" title="Video del producto" allowfullscreen>
+                            </iframe>
+                        </div>
+                    </div>
+        
+                    <div class="modal-footer">
+                        <a id="modalDemo" href="#" target="_blank" class="btn btn-primary">
+                            <i class="fas fa-play me-2"></i>Ver demo
+                        </a>
+
+                        <a id="modalGithub" href="#" target="_blank" class="btn btn-dark">
+                            <i class="fab fa-github me-2"></i>Repositorio
+                        </a>
+                        
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cerrar
+                        </button>
+                    </div>
+        
+                </div>
+            </div>
+        </div>
+        </main>
+
+        <div id="footer-components"></div>
+        
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js"></script>
+
+        <!-- productos.js -->
+        <script src="/assets/js/productos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // Cargar header
+    fetch('header.html')
+        .then(res => res.text())
+        .then(data => {
+            document.getElementById('header-components').innerHTML = data;
+
+            // Lista de scripts a cargar después del header
+            const scriptsToLoad = [
+                'assets/js/common.js',
+                'assets/js/nosotros.js'
+            ];
+
+            scriptsToLoad.forEach(src => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.defer = true; // opcional pero recomendado
+                document.body.appendChild(script);
+            });
+        });
+
+    // Cargar footer
+    fetch('footer.html')
+        .then(res => res.text())
+        .then(data => {
+            document.getElementById('footer-components').innerHTML = data;
+        });
+    </script>
+    </div>
+    </body>
+</html>
