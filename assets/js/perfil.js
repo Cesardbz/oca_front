@@ -64,7 +64,14 @@
                 .in('usuario_id', targetIds);
             
             if (servicesError) console.error("Error cargando servicios:", servicesError);
-            renderServices(services || []);
+
+            // B.2 Cargar Licencias Generadas
+            const { data: licenses } = await supabaseClient
+                .from('licencias')
+                .select('*')
+                .in('usuario_id', targetIds);
+
+            renderServices(services || [], licenses || []);
 
             // C. Cargar Pagos
             const { data: payments, error: paymentsError } = await supabaseClient
@@ -124,7 +131,7 @@
         }
     }
 
-    function renderServices(services) {
+    function renderServices(services, licenses) {
         const tbody = document.getElementById('servicesTableBody');
         const elCount = document.getElementById('countActiveServices');
         
@@ -139,13 +146,18 @@
 
         tbody.innerHTML = services.map(s => {
             const nombre = s.software_venta?.nombre_sistema || s.planes_web?.nombre_plan || 'Servicio';
+            
+            // Buscar la licencia vinculada a este software
+            const lic = licenses.find(l => l.software_id === s.software_id);
+            const claveDisplay = lic ? `<code class="small text-primary">${lic.clave_licencia}</code>` : `<span class="text-muted small">Pendiente</span>`;
+
             return `
                 <tr>
                     <td class="fw-bold">${nombre}</td>
                     <td>${new Date(s.fecha_compra).toLocaleDateString()}</td>
                     <td>${s.proximo_vencimiento ? new Date(s.proximo_vencimiento).toLocaleDateString() : 'N/A'}</td>
                     <td><span class="badge ${s.estado === 'Activo' ? 'bg-success' : 'bg-secondary'}">${s.estado}</span></td>
-                    <td><code class="small text-primary">-- DISPONIBLE --</code></td>
+                    <td>${claveDisplay}</td>
                 </tr>
             `;
         }).join('');
