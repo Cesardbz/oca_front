@@ -687,22 +687,464 @@
     // MÓDULO 7: GESTIÓN DE PLANES WEB
     // ==========================================
     async function renderPlanesWeb() {
-        const { data: planes } = await supabaseClient.from('planes_web').select('*');
+        // Cargar planes y servicios adquiridos para contar clientes
+        const [{ data: planes }, { data: adquiridos }] = await Promise.all([
+            supabaseClient.from('planes_web').select('*').order('precio', { ascending: true }),
+            supabaseClient.from('servicios_adquiridos').select('plan_id, estado')
+        ]);
+
+        // Contar clientes activos por plan
+        const clientesPorPlan = {};
+        (adquiridos || []).forEach(s => {
+            if (s.plan_id && s.estado === 'Activo') {
+                clientesPorPlan[s.plan_id] = (clientesPorPlan[s.plan_id] || 0) + 1;
+            }
+        });
+
+        const etiquetaColors = {
+            'Popular': 'bg-warning text-dark',
+            'Recomendado': 'bg-success text-white',
+            'Básico': 'bg-secondary text-white',
+            'Nuevo': 'bg-info text-white',
+        };
+
         contentArea.innerHTML = `
-            <h4 class="fw-bold mb-4">Planes de Desarrollo Web</h4>
-            <div class="row g-4">
-                ${planes.map(p => `
-                    <div class="col-md-4">
-                        <div class="admin-card border-top border-4 border-primary">
-                            <h5 class="fw-bold">${p.nombre_plan}</h5>
-                            <div class="display-6 fw-bold text-primary mb-3">$${p.precio}</div>
-                            <p class="text-muted small">Estado: <b>${p.estado}</b></p>
-                            <button class="btn btn-primary w-100">Editar Características</button>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="fw-bold m-0">Gestión de Planes Web</h4>
+                    <p class="text-muted small m-0">Administra los planes de desarrollo web que ofreces a tus clientes.</p>
+                </div>
+                <button class="btn btn-primary btn-sm" id="btnNuevoPlan">
+                    <i class="fas fa-plus me-1"></i>Nuevo Plan
+                </button>
+            </div>
+
+            <!-- ESTADÍSTICAS RÁPIDAS -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="admin-card text-center py-3">
+                        <div class="stat-label">PLANES ACTIVOS</div>
+                        <div class="stat-val text-primary">${(planes || []).filter(p => p.estado === 'Activo').length}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="admin-card text-center py-3">
+                        <div class="stat-label">TOTAL PLANES</div>
+                        <div class="stat-val">${(planes || []).length}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="admin-card text-center py-3">
+                        <div class="stat-label">CLIENTES CON PLAN WEB</div>
+                        <div class="stat-val text-success">${Object.values(clientesPorPlan).reduce((a, b) => a + b, 0)}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="admin-card text-center py-3">
+                        <div class="stat-label">PRECIO PROMEDIO</div>
+                        <div class="stat-val text-info">S/ ${(planes && planes.length > 0 ? (planes.reduce((a, p) => a + parseFloat(p.precio || 0), 0) / planes.length).toFixed(0) : 0)}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TARJETAS DE PLANES -->
+            <div class="row g-4" id="planesContainer">
+                ${(planes || []).length === 0 ? `
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-laptop-code fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No hay planes registrados. Crea tu primer plan web.</p>
+                    </div>
+                ` : (planes || []).map(p => {
+                    const etiquetaClass = etiquetaColors[p.etiqueta_especial] || 'bg-primary text-white';
+                    const activoClass = p.estado === 'Activo' ? 'border-primary' : 'border-secondary';
+                    const numClientes = clientesPorPlan[p.id] || 0;
+                    const tipoPagoLabel = p.tipo_pago === 'mensual' ? '/mes' : p.tipo_pago === 'anual' ? '/año' : '';
+                    const colorDot = p.color_tema ? `<span style="width:14px;height:14px;border-radius:50%;background:${p.color_tema};display:inline-block;border:2px solid rgba(0,0,0,0.1)" class="me-1"></span>` : '';
+                    return `
+                        <div class="col-md-4" id="plan-card-${p.id}">
+                            <div class="admin-card h-100 d-flex flex-column border-top border-4 ${activoClass}" style="position: relative;">
+                                ${p.etiqueta_especial ? `<span class="badge ${etiquetaClass} position-absolute top-0 end-0 m-3">${p.etiqueta_especial}</span>` : ''}
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center gap-2 mb-1">${colorDot}<h5 class="fw-bold m-0">${p.nombre_plan}</h5></div>
+                                    ${p.subtitulo ? `<p class="small text-muted mb-1">${p.subtitulo}</p>` : ''}
+                                    <div class="d-flex align-items-baseline gap-2">
+                                        <div class="display-6 fw-bold ${p.estado === 'Activo' ? 'text-primary' : 'text-muted'} mb-0">
+                                            S/ ${parseFloat(p.precio || 0).toFixed(0)}<span class="fs-6 fw-normal text-muted">${tipoPagoLabel}</span>
+                                        </div>
+                                        ${p.precio_tachado ? `<small class="text-muted text-decoration-line-through">S/ ${parseFloat(p.precio_tachado).toFixed(0)}</small>` : ''}
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <span class="badge-status ${p.estado === 'Activo' ? 'bg-light-success text-success' : 'bg-light text-muted'}">
+                                        <i class="fas fa-circle me-1" style="font-size: 8px;"></i>${p.estado || 'Activo'}
+                                    </span>
+                                    <span class="small text-muted"><i class="fas fa-users me-1"></i>${numClientes} cliente${numClientes !== 1 ? 's' : ''}</span>
+                                </div>
+
+                                <!-- CARACTERÍSTICAS DEL PLAN -->
+                                <div class="flex-grow-1 mb-3" id="features-${p.id}">
+                                    <div class="text-center py-2"><div class="spinner-border spinner-border-sm text-primary"></div></div>
+                                </div>
+
+                                <!-- ACCIONES -->
+                                <div class="d-flex gap-2 mt-auto flex-wrap">
+                                    <button class="btn btn-sm btn-primary flex-grow-1" onclick="openPlanModal(${p.id})">
+                                        <i class="fas fa-edit me-1"></i>Editar Plan
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="openFeaturesModal(${p.id}, '${p.nombre_plan}')" title="Gestionar características">
+                                        <i class="fas fa-list-check"></i>
+                                    </button>
+                                    <button class="btn btn-sm ${p.estado === 'Activo' ? 'btn-outline-warning' : 'btn-outline-success'}" 
+                                        onclick="togglePlanEstado(${p.id}, '${p.estado}')" 
+                                        title="${p.estado === 'Activo' ? 'Desactivar' : 'Activar'}">
+                                        <i class="fas fa-power-off"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deletePlan(${p.id})" title="Eliminar plan">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+
+            <!-- MODAL: CREAR / EDITAR PLAN -->
+            <div class="modal fade" id="planFormModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content rounded-4 border-0 shadow">
+                        <div class="modal-header border-0 pb-0">
+                            <h5 class="fw-bold" id="planModalTitle">Nuevo Plan Web</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form id="planForm">
+                            <input type="hidden" id="planId">
+                            <div class="modal-body">
+                                <div class="row g-3">
+                                    <div class="col-md-8">
+                                        <label class="form-label small fw-bold">Nombre del Plan</label>
+                                        <input type="text" id="planNombre" class="form-control" placeholder="Ej: Plan Profesional" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold">Precio (S/)</label>
+                                        <input type="number" id="planPrecio" class="form-control" step="0.01" min="0" placeholder="0.00" required>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label class="form-label small fw-bold">Subtítulo <span class="text-muted fw-normal">(descripción corta)</span></label>
+                                        <input type="text" id="planSubtitulo" class="form-control" placeholder="Ej: Landing Page Profesional">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold">Precio Original (tachado)</label>
+                                        <input type="number" id="planPrecioTachado" class="form-control" step="0.01" min="0" placeholder="Precio sin descuento">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small fw-bold">Color del Plan <span class="text-muted fw-normal">(se verá en la web pública)</span></label>
+                                        <div class="d-flex gap-2 flex-wrap" id="colorSwatches">
+                                            ${[
+                                                { val: 'linear-gradient(135deg, #4A90E2 0%, #357ABD 100%)', name: 'Azul (Profesional)' },
+                                                { val: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)', name: 'Índigo (Premium)' },
+                                                { val: 'linear-gradient(135deg, #10b981 0%, #047857 100%)', name: 'Verde (Éxito)' },
+                                                { val: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', name: 'Naranja (Promo)' },
+                                                { val: 'linear-gradient(135deg, #f43f5e 0%, #be123c 100%)', name: 'Rosa (Destacado)' },
+                                                { val: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)', name: 'Oscuro (Dark)' },
+                                                { val: '#ffffff', name: 'Blanco (Básico)' },
+                                            ].map(c => `
+                                                <div class="color-swatch" data-color="${c.val}" title="${c.name}"
+                                                    style="width:36px;height:36px;border-radius:8px;background:${c.val};cursor:pointer;border:3px solid #e2e8f0;transition:all 0.2s;flex-shrink:0"
+                                                    onclick="selectPlanColor(this.dataset.color, this)">
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                        <input type="hidden" id="planColor">
+                                        <small class="text-muted mt-1 d-block">Haz clic en un color para seleccionarlo.</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Etiqueta Especial</label>
+                                        <select id="planEtiqueta" class="form-select">
+                                            <option value="">Ninguna</option>
+                                            <option value="MÁS VENDIDO">MÁS VENDIDO</option>
+                                            <option value="POPULAR">POPULAR</option>
+                                            <option value="RECOMENDADO">RECOMENDADO</option>
+                                            <option value="NUEVO">NUEVO</option>
+                                            <option value="OFERTA">OFERTA</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Tipo de Pago</label>
+                                        <select id="planTipoPago" class="form-select">
+                                            <option value="único">Pago Único</option>
+                                            <option value="mensual">Mensual</option>
+                                            <option value="anual">Anual</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Estado</label>
+                                        <select id="planEstado" class="form-select">
+                                            <option value="Activo">Activo</option>
+                                            <option value="Inactivo">Inactivo</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-0 pt-0">
+                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-primary px-4 rounded-pill" id="planSubmitBtn">Guardar Plan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL: GESTIÓN DE CARACTERÍSTICAS -->
+            <div class="modal fade" id="featuresModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content rounded-4 border-0 shadow">
+                        <div class="modal-header border-0 pb-0">
+                            <div>
+                                <h5 class="fw-bold m-0" id="featuresPlanTitle">Características del Plan</h5>
+                                <p class="small text-muted m-0">Administra qué incluye este plan</p>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Agregar nueva característica -->
+                            <div class="d-flex gap-2 mb-4">
+                                <select id="featureIncluido" class="form-select" style="max-width: 130px;">
+                                    <option value="true">✅ Incluido</option>
+                                    <option value="false">❌ No incluido</option>
+                                </select>
+                                <input type="text" id="featureTexto" class="form-control" placeholder="Ej: Hasta 8 páginas, SSL incluido, Diseño responsive...">
+                                <button class="btn btn-primary px-3" id="btnAddFeature" type="button">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <!-- Lista de características existentes -->
+                            <div id="featuresListContainer">
+                                <div class="text-center py-3"><div class="spinner-border text-primary"></div></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-primary px-4" data-bs-dismiss="modal">Listo</button>
                         </div>
                     </div>
-                `).join('')}
+                </div>
             </div>
         `;
+
+        // Cargar características para cada plan en paralelo
+        const loadAllFeatures = async () => {
+            await Promise.all((planes || []).map(async p => {
+                const { data: features } = await supabaseClient
+                    .from('detalles_items')
+                    .select('*')
+                    .eq('item_id', p.id)
+                    .eq('tipo_item', 'plan');
+                
+                const container = document.getElementById(`features-${p.id}`);
+                if (!container) return;
+                
+                if (!features || features.length === 0) {
+                    container.innerHTML = `<p class="small text-muted text-center">Sin características.<br><a href="#" onclick="openFeaturesModal(${p.id}, '${p.nombre_plan}');return false;" class="small">Agregar características</a></p>`;
+                    return;
+                }
+                container.innerHTML = `
+                    <ul class="list-unstyled mb-0">
+                        ${features.slice(0, 5).map(f => `
+                            <li class="small mb-1">
+                                <i class="fas fa-${f.incluido ? 'check text-success' : 'times text-danger'} me-2"></i>${f.caracteristica}
+                            </li>
+                        `).join('')}
+                        ${features.length > 5 ? `<li class="small text-muted mt-1">+ ${features.length - 5} más...</li>` : ''}
+                    </ul>
+                `;
+            }));
+        };
+        loadAllFeatures();
+
+        // ---- LÓGICA DEL MODAL DE PLAN ----
+        document.getElementById('btnNuevoPlan').addEventListener('click', () => openPlanModal(null));
+
+        window.openPlanModal = async (planId) => {
+            const modal = new bootstrap.Modal(document.getElementById('planFormModal'));
+            document.getElementById('planForm').reset();
+            document.getElementById('planId').value = '';
+            document.getElementById('planColor').value = '';
+            // Reset swatch selection
+            document.querySelectorAll('.color-swatch').forEach(s => s.style.border = '3px solid #e2e8f0');
+
+            if (planId) {
+                document.getElementById('planModalTitle').textContent = 'Editar Plan Web';
+                const plan = (planes || []).find(p => p.id === planId);
+                if (plan) {
+                    document.getElementById('planId').value = plan.id;
+                    document.getElementById('planNombre').value = plan.nombre_plan || '';
+                    document.getElementById('planPrecio').value = plan.precio || '';
+                    document.getElementById('planSubtitulo').value = plan.subtitulo || '';
+                    document.getElementById('planPrecioTachado').value = plan.precio_tachado || '';
+                    document.getElementById('planEtiqueta').value = plan.etiqueta_especial || '';
+                    document.getElementById('planTipoPago').value = plan.tipo_pago || 'único';
+                    document.getElementById('planEstado').value = plan.estado || 'Activo';
+                    // Pre-select color swatch
+                    if (plan.color_tema) {
+                        document.getElementById('planColor').value = plan.color_tema;
+                        const swatch = document.querySelector(`.color-swatch[data-color="${CSS.escape ? plan.color_tema : plan.color_tema}"]`);
+                        if (swatch) swatch.style.border = '3px solid #6366f1';
+                    }
+                }
+            } else {
+                document.getElementById('planModalTitle').textContent = 'Nuevo Plan Web';
+            }
+            modal.show();
+        };
+
+        document.getElementById('planForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('planSubmitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
+
+            const id = document.getElementById('planId').value;
+            const precioTachadoVal = document.getElementById('planPrecioTachado').value;
+            const data = {
+                nombre_plan: document.getElementById('planNombre').value,
+                precio: parseFloat(document.getElementById('planPrecio').value),
+                subtitulo: document.getElementById('planSubtitulo').value || null,
+                precio_tachado: precioTachadoVal ? parseFloat(precioTachadoVal) : null,
+                color_tema: document.getElementById('planColor').value || null,
+                etiqueta_especial: document.getElementById('planEtiqueta').value || null,
+                tipo_pago: document.getElementById('planTipoPago').value,
+                estado: document.getElementById('planEstado').value,
+            };
+
+            try {
+                const { error } = id
+                    ? await supabaseClient.from('planes_web').update(data).eq('id', id)
+                    : await supabaseClient.from('planes_web').insert(data);
+                if (error) throw error;
+                bootstrap.Modal.getInstance(document.getElementById('planFormModal')).hide();
+                renderPlanesWeb();
+            } catch (err) {
+                alert('Error al guardar: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Guardar Plan';
+            }
+        });
+
+        // ---- SELECCIÓN DE COLOR EN SWATCHES ----
+        window.selectPlanColor = (colorVal, el) => {
+            document.querySelectorAll('.color-swatch').forEach(s => s.style.border = '3px solid #e2e8f0');
+            el.style.border = '3px solid #6366f1';
+            el.style.boxShadow = '0 0 0 2px #6366f130';
+            document.getElementById('planColor').value = colorVal;
+        };
+
+        // ---- TOGGLE ESTADO ----
+        window.togglePlanEstado = async (id, estadoActual) => {
+            const nuevoEstado = estadoActual === 'Activo' ? 'Inactivo' : 'Activo';
+            const { error } = await supabaseClient.from('planes_web').update({ estado: nuevoEstado }).eq('id', id);
+            if (error) alert('Error: ' + error.message);
+            else renderPlanesWeb();
+        };
+
+        // ---- ELIMINAR PLAN ----
+        window.deletePlan = async (id) => {
+            if (!confirm('¿Seguro que quieres eliminar este plan? También se eliminarán sus características.')) return;
+            await supabaseClient.from('detalles_items').delete().eq('item_id', id).eq('tipo_item', 'plan');
+            const { error } = await supabaseClient.from('planes_web').delete().eq('id', id);
+            if (error) alert('Error: ' + error.message);
+            else renderPlanesWeb();
+        };
+
+        // ---- MODAL DE CARACTERÍSTICAS ----
+        let _currentFeaturePlanId = null;
+
+        window.openFeaturesModal = async (planId, planName) => {
+            _currentFeaturePlanId = planId;
+            document.getElementById('featuresPlanTitle').textContent = `Características: ${planName}`;
+            document.getElementById('featureTexto').value = '';
+            const modal = new bootstrap.Modal(document.getElementById('featuresModal'));
+            modal.show();
+            await loadFeaturesList(planId);
+        };
+
+        async function loadFeaturesList(planId) {
+            const container = document.getElementById('featuresListContainer');
+            container.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary"></div></div>';
+            
+            const { data: features } = await supabaseClient
+                .from('detalles_items')
+                .select('*')
+                .eq('item_id', planId)
+                .eq('tipo_item', 'plan')
+                .order('incluido', { ascending: false });
+
+            if (!features || features.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center py-3">No hay características. Agrega la primera arriba.</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="d-flex flex-column gap-2">
+                    ${features.map(f => `
+                        <div class="d-flex align-items-center justify-content-between p-3 rounded-3 border" id="feat-row-${f.id}" style="background: ${f.incluido ? '#f0fdf4' : '#fef9f0'};">
+                            <div class="d-flex align-items-center gap-3">
+                                <i class="fas fa-${f.incluido ? 'check-circle text-success' : 'times-circle text-danger'} fs-5"></i>
+                                <span class="small fw-semibold">${f.caracteristica}</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-light" title="Toggle incluido" onclick="toggleFeature(${f.id}, ${f.incluido}, ${planId})">
+                                    <i class="fas fa-toggle-${f.incluido ? 'on text-success' : 'off text-muted'}"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteFeature(${f.id}, ${planId})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        document.getElementById('btnAddFeature').addEventListener('click', async () => {
+            const texto = document.getElementById('featureTexto').value.trim();
+            const incluido = document.getElementById('featureIncluido').value === 'true';
+            if (!texto) { alert('Escribe una característica primero.'); return; }
+            
+            const btn = document.getElementById('btnAddFeature');
+            btn.disabled = true;
+            const { error } = await supabaseClient.from('detalles_items').insert({
+                item_id: _currentFeaturePlanId,
+                tipo_item: 'plan',
+                caracteristica: texto,
+                incluido: incluido
+            });
+            if (error) alert('Error: ' + error.message);
+            else {
+                document.getElementById('featureTexto').value = '';
+                await loadFeaturesList(_currentFeaturePlanId);
+                // Refrescar preview de características en la tarjeta
+                const { data: refreshed } = await supabaseClient.from('detalles_items').select('*').eq('item_id', _currentFeaturePlanId).eq('tipo_item', 'plan');
+                const pName = (planes || []).find(p => p.id === _currentFeaturePlanId)?.nombre_plan || '';
+                const fc = document.getElementById(`features-${_currentFeaturePlanId}`);
+                if (fc && refreshed) {
+                    fc.innerHTML = `<ul class="list-unstyled mb-0">${refreshed.slice(0, 5).map(f => `<li class="small mb-1"><i class="fas fa-${f.incluido ? 'check text-success' : 'times text-danger'} me-2"></i>${f.caracteristica}</li>`).join('')}${refreshed.length > 5 ? `<li class="small text-muted mt-1">+ ${refreshed.length - 5} más...</li>` : ''}</ul>`;
+                }
+            }
+            btn.disabled = false;
+        });
+
+        window.toggleFeature = async (featId, currentVal, planId) => {
+            await supabaseClient.from('detalles_items').update({ incluido: !currentVal }).eq('id', featId);
+            await loadFeaturesList(planId);
+        };
+
+        window.deleteFeature = async (featId, planId) => {
+            if (!confirm('¿Eliminar esta característica?')) return;
+            await supabaseClient.from('detalles_items').delete().eq('id', featId);
+            await loadFeaturesList(planId);
+        };
     }
 
     // ==========================================

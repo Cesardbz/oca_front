@@ -77,16 +77,188 @@
                 <div class="header-line mx-auto"></div>
             </div>
 
-            <div class="row g-4 align-items-stretch justify-content-center pt-3">
+            <!-- CONTENEDOR DINÁMICO — cargado desde Supabase -->
+            <div class="row g-4 align-items-stretch justify-content-center pt-3" id="planesWebPublico">
+                <!-- Skeleton loader mientras carga -->
+                <div class="col-12 text-center py-5" id="planesLoader">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="text-muted mt-2 small">Cargando planes...</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                <!-- Plan Básico -->
+    <!-- Footer Dinámico -->
+    <div id="footer-components"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase-client.js"></script>
+    <script>
+        // -------------------------------------------------------
+        // Cargar header, footer y scripts comunes
+        // -------------------------------------------------------
+        fetch('header.html')
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById('header-components').innerHTML = data;
+                const script = document.createElement('script');
+                script.src = 'assets/js/common.js';
+                document.body.appendChild(script);
+            });
+
+        fetch('footer.html')
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById('footer-components').innerHTML = data;
+            });
+
+        // -------------------------------------------------------
+        // Animación de aparición al hacer scroll
+        // -------------------------------------------------------
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll('.info-section').forEach(el => observer.observe(el));
+        });
+
+        // -------------------------------------------------------
+        // CARGA DINÁMICA DE PLANES DESDE SUPABASE
+        // -------------------------------------------------------
+
+        // CSS classes asignadas por posición de precio (cheap→mid→expensive)
+        const PLAN_STYLES = [
+            { cardClass: 'plan-basico',      btnClass: '',                   textClass: 'text-muted' },
+            { cardClass: 'plan-profesional', btnClass: 'text-dark fw-bold',  textClass: '' },
+            { cardClass: 'plan-ecommerce',   btnClass: '',                   textClass: 'text-muted' },
+        ];
+
+        async function cargarPlanesWeb() {
+            const container = document.getElementById('planesWebPublico');
+
+            try {
+                // 1. Obtener planes activos ordenados por precio
+                const { data: planes, error } = await supabaseClient
+                    .from('planes_web')
+                    .select('*')
+                    .eq('estado', 'Activo')
+                    .order('precio', { ascending: true });
+
+                if (error) throw error;
+
+                // 2. Si no hay planes en DB, mostrar los cards estáticos de respaldo
+                if (!planes || planes.length === 0) {
+                    renderFallbackPlanes(container);
+                    return;
+                }
+
+                // 3. Obtener características de todos los planes en una sola query
+                const planIds = planes.map(p => String(p.id));
+                const { data: features } = await supabaseClient
+                    .from('detalles_items')
+                    .select('*')
+                    .in('item_id', planIds)
+                    .eq('tipo_item', 'plan')
+                    .order('incluido', { ascending: false });
+
+                // 4. Agrupar features por plan_id (normalizado a string)
+                const featuresByPlan = {};
+                (features || []).forEach(f => {
+                    const key = String(f.item_id);
+                    if (!featuresByPlan[key]) featuresByPlan[key] = [];
+                    featuresByPlan[key].push(f);
+                });
+
+                // 5. Renderizar tarjetas
+                const tipoPagoLabel = (tipo) => {
+                    if (tipo === 'mensual') return '/mes';
+                    if (tipo === 'anual') return '/año';
+                    return '';
+                };
+
+                container.innerHTML = planes.map((plan, idx) => {
+                    const style = PLAN_STYLES[Math.min(idx, PLAN_STYLES.length - 1)];
+                    const planFeatures = featuresByPlan[String(plan.id)] || [];
+                    const etiqueta = plan.etiqueta_especial;
+                    const sufijo = tipoPagoLabel(plan.tipo_pago);
+                    const hasColor = plan.color_tema && plan.color_tema !== '#ffffff';
+
+                    // Si hay color_tema → card con gradiente custom y texto blanco
+                    // Si no → usar CSS class fallback (plan-basico, plan-profesional, etc.)
+                    const cardStyle = hasColor
+                        ? `style="background:${plan.color_tema};color:#fff;border:none;"`
+                        : '';
+                    const cardClass = hasColor ? 'plan-card' : `plan-card ${style.cardClass}`;
+                    const textColorClass = hasColor ? 'text-white' : style.textClass;
+                    const isColoredBtn = hasColor;
+                    const isDestacado = style.cardClass === 'plan-profesional' && !hasColor;
+
+                    const featuresHtml = planFeatures.length > 0
+                        ? planFeatures.map(f => `
+                            <li style="${hasColor && !f.incluido ? 'opacity:0.5' : ''}">
+                                <i class="fas fa-${f.incluido ? 'check' : 'times'}"
+                                   style="${!f.incluido && !hasColor ? 'opacity:0.4' : ''}${hasColor ? ';color:#fff;background:rgba(255,255,255,0.2)' : ''}"></i>
+                                ${f.caracteristica}
+                            </li>`).join('')
+                        : `<li><i class="fas fa-check" ${hasColor ? 'style="color:#fff;background:rgba(255,255,255,0.2)"' : ''}></i> Consulta para más detalles</li>`;
+
+                    return `
+                        <div class="col-lg-4 col-md-6">
+                            <div class="${cardClass}" ${cardStyle}>
+                                ${etiqueta ? `<span class="badge-popular">${etiqueta}</span>` : ''}
+
+                                <h3 ${hasColor ? 'style="color:#fff!important"' : ''}>${plan.nombre_plan}</h3>
+
+                                ${plan.subtitulo ? `<p class="small fw-bold text-uppercase mb-0" style="${hasColor ? 'color:rgba(255,255,255,0.8)!important' : ''}">${plan.subtitulo}</p>` : ''}
+
+                                <div class="price" ${hasColor ? 'style="color:#fff!important"' : ''}>
+                                    S/ ${parseFloat(plan.precio).toFixed(0)}
+                                    <span class="fs-6 fw-normal ${textColorClass}">PEN${sufijo}</span>
+                                </div>
+                                ${plan.precio_tachado ? `<p class="regular-price" style="${hasColor ? 'color:rgba(255,255,255,0.6)!important' : ''}">Precio regular S/ ${parseFloat(plan.precio_tachado).toFixed(0)}</p>` : ''}
+
+                                <ul class="plan-features mt-3">
+                                    ${featuresHtml}
+                                </ul>
+
+                                <button class="btn btn-plan ${isDestacado ? 'text-dark fw-bold' : ''}"
+                                    style="${isColoredBtn ? 'border-color:rgba(255,255,255,0.6);color:#fff;' : ''}"
+                                    onmouseover="${isColoredBtn ? "this.style.background='rgba(255,255,255,0.15)'" : ''}"
+                                    onmouseout="${isColoredBtn ? "this.style.background='transparent'" : ''}"
+                                    onclick="solicitarPlanWeb('${plan.nombre_plan}', '${parseFloat(plan.precio).toFixed(0)}')">
+                                    ${(isDestacado || hasColor) ? `QUIERO ESTE PLAN <i class='fas fa-arrow-right ms-2'></i>` : 'MÁS INFORMACIÓN'}
+                                </button>
+                                <p class="small mt-3 mb-0 fw-bold ${textColorClass}" style="${hasColor ? 'color:rgba(255,255,255,0.8)!important' : ''}">
+                                    <i class="fas fa-lock me-1"></i>
+                                    ${plan.tipo_pago === 'mensual' ? 'Pago Mensual' : plan.tipo_pago === 'anual' ? 'Pago Anual' : 'Pago Único'}
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // Activar observer en los nuevos cards
+                document.querySelectorAll('.plan-card').forEach(el => observer.observe(el));
+
+            } catch (err) {
+                console.error('Error cargando planes desde Supabase:', err);
+                renderFallbackPlanes(container);
+            }
+        }
+
+        // Planes de respaldo en caso de error o DB vacía
+        function renderFallbackPlanes(container) {
+            container.innerHTML = `
                 <div class="col-lg-4 col-md-6">
                     <div class="plan-card plan-basico">
                         <h3>Básico</h3>
                         <p class="text-muted small fw-bold text-uppercase">Landing Page Profesional</p>
                         <div class="price">S/ 330 <span class="fs-6 text-muted fw-normal">PEN</span></div>
                         <p class="regular-price">Precio regular S/ 400</p>
-
                         <ul class="plan-features mt-3">
                             <li><i class="fas fa-check"></i> Diseño Web a Medida (1 Página)</li>
                             <li><i class="fas fa-check"></i> Hosting y Dominio (.com) Anual</li>
@@ -96,25 +268,17 @@
                             <li><i class="fas fa-check"></i> Correos Corporativos</li>
                             <li><i class="fas fa-check"></i> Certificado de Seguridad SSL</li>
                         </ul>
-
-                        <button class="btn btn-plan" onclick="solicitarPlanWeb('Básico', '330')">
-                            MÁS INFORMACIÓN
-                        </button>
+                        <button class="btn btn-plan" onclick="solicitarPlanWeb('Básico', '330')">MÁS INFORMACIÓN</button>
                         <p class="small text-muted mt-3 mb-0 fw-bold"><i class="fas fa-lock me-1"></i> Pago Único</p>
                     </div>
                 </div>
-
-                <!-- Plan Profesional (Destacado) -->
                 <div class="col-lg-4 col-md-6">
                     <div class="plan-card plan-profesional">
                         <span class="badge-popular">MÁS VENDIDO</span>
                         <h3>Profesional</h3>
-                        <p class="small fw-bold text-uppercase" style="color: rgba(255,255,255,0.8) !important;">Sitio
-                            Multi-Página Corporativo</p>
-                        <div class="price">S/ 460 <span class="fs-6 fw-normal"
-                                style="color: rgba(255,255,255,0.8) !important;">PEN</span></div>
+                        <p class="small fw-bold text-uppercase" style="color: rgba(255,255,255,0.8) !important;">Sitio Multi-Página</p>
+                        <div class="price">S/ 460 <span class="fs-6 fw-normal" style="color:rgba(255,255,255,0.8)!important">PEN</span></div>
                         <p class="regular-price">Precio regular S/ 560</p>
-
                         <ul class="plan-features mt-3">
                             <li><i class="fas fa-check"></i> Todas las bondades del Básico</li>
                             <li><i class="fas fa-check"></i> Hasta 5 Páginas Autoadministrables</li>
@@ -124,24 +288,18 @@
                             <li><i class="fas fa-check"></i> Conexión total a Redes Sociales</li>
                             <li><i class="fas fa-check"></i> Indexación en Google de Inmediato</li>
                         </ul>
-
-                        <button class="btn btn-plan text-dark fw-bold"
-                            onclick="solicitarPlanWeb('Profesional Multi-Página', '460')">
+                        <button class="btn btn-plan text-dark fw-bold" onclick="solicitarPlanWeb('Profesional', '460')">
                             QUIERO ESTE PLAN <i class="fas fa-arrow-right ms-2"></i>
                         </button>
-                        <p class="small mt-3 mb-0 fw-bold" style="color: rgba(255,255,255,0.8) !important;"><i
-                                class="fas fa-lock me-1"></i> Pago Único</p>
+                        <p class="small mt-3 mb-0 fw-bold" style="color:rgba(255,255,255,0.8)!important"><i class="fas fa-lock me-1"></i> Pago Único</p>
                     </div>
                 </div>
-
-                <!-- Plan Ecommerce -->
                 <div class="col-lg-4 col-md-6">
                     <div class="plan-card plan-ecommerce">
                         <h3>Ecommerce</h3>
                         <p class="text-muted small fw-bold text-uppercase">Tienda Virtual Completa</p>
                         <div class="price">S/ 700 <span class="fs-6 text-muted fw-normal">PEN</span></div>
                         <p class="regular-price">Precio regular S/ 930</p>
-
                         <ul class="plan-features mt-3">
                             <li><i class="fas fa-check"></i> Todas las funciones del Profesional</li>
                             <li><i class="fas fa-check"></i> Carrito de Compras Activo</li>
@@ -151,92 +309,33 @@
                             <li><i class="fas fa-check"></i> Cupones de Descuento y Métricas</li>
                             <li><i class="fas fa-check"></i> Capacitación Completa de Uso</li>
                         </ul>
-
-                        <button class="btn btn-plan" onclick="solicitarPlanWeb('Tienda Virtual Ecommerce', '700')">
-                            MÁS INFORMACIÓN
-                        </button>
+                        <button class="btn btn-plan" onclick="solicitarPlanWeb('Ecommerce', '700')">MÁS INFORMACIÓN</button>
                         <p class="small text-muted mt-3 mb-0 fw-bold"><i class="fas fa-lock me-1"></i> Pago Único</p>
                     </div>
                 </div>
+            `;
+        }
 
-            </div>
-        </div>
-    </section>
+        // Intentar cargar en cuanto supabaseClient esté disponible (se carga async)
+        function waitForSupabaseAndLoad() {
+            if (typeof supabaseClient !== 'undefined') {
+                cargarPlanesWeb();
+            } else {
+                setTimeout(waitForSupabaseAndLoad, 100);
+            }
+        }
 
-    <!-- Footer Dinámico -->
-    <div id="footer-components"></div>
+        document.addEventListener('DOMContentLoaded', waitForSupabaseAndLoad);
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Cargar header
-        fetch('header.html')
-            .then(res => res.text())
-            .then(data => {
-                document.getElementById('header-components').innerHTML = data;
-
-                // Lista de scripts a cargar con orden de dependencia
-                const scriptsToLoad = [
-                    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
-                    'assets/js/supabase-client.js',
-                    'assets/js/common.js'
-                ];
-
-                let idx = 0;
-                function loadScripts() {
-                    if (idx < scriptsToLoad.length) {
-                        const script = document.createElement('script');
-                        script.src = scriptsToLoad[idx];
-                        script.onload = () => {
-                            idx++;
-                            loadScripts();
-                        };
-                        document.body.appendChild(script);
-                    }
-                }
-                loadScripts();
-            });
-
-        // Cargar footer
-        fetch('footer.html')
-            .then(res => res.text())
-            .then(data => {
-                document.getElementById('footer-components').innerHTML = data;
-            });
-
-        // Animación suave de aparición al hacer scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, observerOptions);
-
-        document.addEventListener("DOMContentLoaded", () => {
-            document.querySelectorAll('.plan-card, .info-section').forEach(el => {
-                observer.observe(el);
-            });
-        });
-
-        // ----------------------------------------------------
-        // Lógica de Autocompletado de Ventas Directas Web
-        // ----------------------------------------------------
+        // -------------------------------------------------------
+        // Autocompletado de solicitud de plan vía modal de contacto
+        // -------------------------------------------------------
         function solicitarPlanWeb(nombrePlan, precio) {
             const modal = document.getElementById('contactModal');
             if (modal) {
-                // Abre el modal corporativo
                 modal.classList.add('active');
-
-                // Pre-selecciona la intención del Select
                 const selectAsunto = document.querySelector('#contactForm select');
                 if (selectAsunto) selectAsunto.value = 'cotizacion';
-
-                // Autocompleta la trama de venta con una redacción persuasiva
                 const textArea = document.getElementById('comentario');
                 if (textArea) {
                     textArea.value = `¡Hola Equipo OCA! Estoy sumamente interesado/a en adquirir el Plan "${nombrePlan}" de Páginas Web por la tarifa promocional de S/. ${precio}. Mi negocio o idea es sobre [Escribe aquí de qué trata tu negocio] y me gustaría que me contacten lo antes posible.`;
