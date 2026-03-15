@@ -4,6 +4,7 @@ from typing import Optional
 from app.supabase_client import supabase
 from app.services.license import generate_license_key
 from app.services.email import send_license_email
+from datetime import datetime, timedelta
 
 router = APIRouter(prefix="/payments", tags=["payments"])
 
@@ -80,13 +81,27 @@ async def activate_service(request: ActivationRequest):
         prod_id = service.data[0].get("software_id") or service.data[0].get("plan_id")
         license_key = generate_license_key(request.user_id, str(prod_id))
 
-        # 3. Actualizar estado y asignar licencia
+        # 3. Actualizar estado en servicios_adquiridos
         supabase.table("servicios_adquiridos").update({
-            "estado": "Activo",
-            "licencia": license_key
+            "estado": "Activo"
         }).eq("id", service.data[0]["id"]).execute()
 
-        # 4. Enviar correo (Opcional, no bloquea la respuesta)
+        # 4. Insertar en la tabla 'licencias'
+        licencia_data = {
+            "usuario_id": request.user_id,
+            "clave_licencia": license_key,
+            "fecha_activacion": datetime.now().strftime("%Y-%m-%d"),
+            "fecha_expiracion": (datetime.now() + timedelta(days=365)).strftime("%Y-%m-%d"),
+            "estado": "Activo"
+        }
+        
+        # Si es software, asignamos el ID. Si es plan web, podrías tener otra lógica o usar el mismo campo si es genérico
+        if service.data[0].get("software_id"):
+            licencia_data["software_id"] = service.data[0]["software_id"]
+
+        supabase.table("licencias").insert(licencia_data).execute()
+
+        # 5. Enviar correo (Opcional, no bloquea la respuesta)
         # En una app real, obtendríamos el email del usuario desde Supabase auth
         user_res = supabase.auth.admin.get_user_by_id(request.user_id)
         if user_res.user:
