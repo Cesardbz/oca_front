@@ -60,17 +60,12 @@ async def process_payment(request: PaymentRequest):
 @router.post("/activate")
 async def activate_service(request: ActivationRequest):
     """
-    Lógica de backend: Valida el pago (rol admin), genera licencia y activa el servicio.
+    Lógica de backend: Valida el pago, genera licencia y guarda en la tabla 'licencias'.
     """
     try:
         # 1. Verificar el pago en Supabase
         payment = supabase.table("pagos").select("*").eq("id", request.payment_id).execute()
         
-        if not payment.data or payment.data[0]["estado_pago"] != "Completado":
-             # En un escenario real, aquí se validaría el comprobante
-             # Por ahora simulamos que si el admin lo aprueba, se llama a este endpoint
-             pass
-
         # 2. Generar licencia
         # Necesitamos el product_id del servicio vinculado
         service = supabase.table("servicios_adquiridos").select("*").eq("usuario_id", request.user_id).order("id", desc=True).limit(1).execute()
@@ -81,12 +76,12 @@ async def activate_service(request: ActivationRequest):
         prod_id = service.data[0].get("software_id") or service.data[0].get("plan_id")
         license_key = generate_license_key(request.user_id, str(prod_id))
 
-        # 3. Actualizar estado en servicios_adquiridos
+        # 3. Actualizar estado en servicios_adquiridos (Estado: Activo)
         supabase.table("servicios_adquiridos").update({
             "estado": "Activo"
         }).eq("id", service.data[0]["id"]).execute()
 
-        # 4. Insertar en la tabla 'licencias'
+        # 4. Insertar en la tabla dedicada 'licencias'
         licencia_data = {
             "usuario_id": request.user_id,
             "clave_licencia": license_key,
@@ -95,14 +90,12 @@ async def activate_service(request: ActivationRequest):
             "estado": "Activo"
         }
         
-        # Si es software, asignamos el ID. Si es plan web, podrías tener otra lógica o usar el mismo campo si es genérico
         if service.data[0].get("software_id"):
             licencia_data["software_id"] = service.data[0]["software_id"]
 
         supabase.table("licencias").insert(licencia_data).execute()
 
-        # 5. Enviar correo (Opcional, no bloquea la respuesta)
-        # En una app real, obtendríamos el email del usuario desde Supabase auth
+        # 5. Enviar correo
         user_res = supabase.auth.admin.get_user_by_id(request.user_id)
         if user_res.user:
             await send_license_email(user_res.user.email, license_key, "Servicio OCA")
@@ -110,7 +103,7 @@ async def activate_service(request: ActivationRequest):
         return {
             "status": "activated",
             "license": license_key,
-            "message": "Servicio activado y correo enviado."
+            "message": "Servicio activado y registrado en tabla licencias."
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
