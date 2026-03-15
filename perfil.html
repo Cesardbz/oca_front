@@ -194,6 +194,40 @@
             .stat-widget { gap: 10px; }
             .stat-icon { width: 40px; height: 40px; font-size: 16px; }
         }
+
+        /* CHAT MODAL CUSTOM STYLES */
+        #chatMessages {
+            height: 350px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 10px;
+        }
+        .msg {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .msg-me {
+            align-self: flex-end;
+            background: var(--primary-blue);
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+        .msg-other {
+            align-self: flex-start;
+            background: #f1f5f9;
+            color: var(--text-dark);
+            border-bottom-left-radius: 2px;
+        }
+        .chat-input-area {
+            border-top: 1px solid var(--border-color);
+            padding: 15px;
+            background: #fff;
+        }
     </style>
 </head>
 <body>
@@ -374,6 +408,30 @@
             </div>
 
         </main>
+    </div>
+
+    <!-- MODAL DE CHAT -->
+    <div class="modal fade" id="chatModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                <div class="modal-header bg-primary text-white border-0 py-3">
+                    <h6 class="modal-title fw-bold" id="chatTitle">Chat de Soporte</h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0 bg-light">
+                    <div id="chatMessages" class="p-3">
+                        <!-- Mensajes cargados dinámicamente -->
+                        <div class="text-center text-muted small py-5">Cargando conversación...</div>
+                    </div>
+                    <form id="chatForm" class="chat-input-area d-flex gap-2">
+                        <input type="text" id="chatInput" class="form-control border-0 bg-light rounded-pill px-4" placeholder="Escribe un mensaje..." autocomplete="off">
+                        <button type="submit" class="btn btn-primary rounded-circle" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- INPUT OCULTO PARA SUBIR COMPROBANTES -->

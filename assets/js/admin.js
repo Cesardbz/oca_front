@@ -447,12 +447,33 @@
                                 <p class="small text-muted mb-3">${t.descripcion_problema}</p>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="small"><b>Cliente:</b> ${t.usuarios?.nombre_completo}</div>
-                                    <button class="btn btn-sm btn-primary">Responder</button>
+                                    <button class="btn btn-sm btn-primary rounded-pill px-3" onclick="openAdminChat('${t.id}', '${t.asunto}')">Responder</button>
                                 </div>
                             </div>
                         </div>
                     `;
                 }).join('')}
+            </div>
+
+            <!-- MODAL DE CHAT PARA ADMIN -->
+            <div class="modal fade" id="chatModalAdmin" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                        <div class="modal-header bg-dark text-white border-0">
+                            <h6 class="modal-title fw-bold" id="chatTitleAdmin">Soporte con Cliente</h6>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body p-0 bg-light">
+                            <div id="chatMessagesAdmin" style="height: 350px; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+                                <div class="text-center py-5 text-muted">Cargando...</div>
+                            </div>
+                            <form id="chatFormAdmin" style="border-top: 1px solid #eee; padding: 15px; background: #fff;" class="d-flex gap-2">
+                                <input type="text" id="chatInputAdmin" class="form-control rounded-pill border-0 bg-light px-3" placeholder="Responde al cliente..." autocomplete="off">
+                                <button type="submit" class="btn btn-dark rounded-circle"><i class="fas fa-paper-plane"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         `;
     }
@@ -461,30 +482,205 @@
     // MÓDULO 3: CATÁLOGO DE PRODUCTOS (SOFTWARE)
     // ==========================================
     async function renderCatalogo() {
-        const { data: soft } = await supabaseClient.from('software_venta').select('*');
+        const { data: soft } = await supabaseClient.from('software_venta').select('*').order('id', { ascending: false });
+        
         contentArea.innerHTML = `
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h4 class="fw-bold m-0">Catálogo de Software</h4>
-                <button class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>Nuevo Software</button>
+                <button class="btn btn-primary btn-sm" onclick="openProductModal()"><i class="fas fa-plus me-1"></i>Nuevo Software</button>
             </div>
-            <div class="row g-4">
+            <div class="row g-4" id="catalogoContainer">
                 ${soft.length === 0 ? '<div class="col-12 text-center py-5">No hay productos en el catálogo.</div>' : soft.map(s => `
                     <div class="col-md-4">
-                        <div class="admin-card">
+                        <div class="admin-card h-100 d-flex flex-column">
                             <img src="${s.url_imagen || 'assets/img/servicios/software-default.jpg'}" class="img-fluid rounded mb-3" style="height: 150px; width: 100%; object-fit: cover;">
                             <h6 class="fw-bold mb-1">${s.nombre_sistema}</h6>
+                            <p class="small text-muted flex-grow-1">${s.descripcion?.substring(0, 80)}...</p>
                             <div class="mb-3">
-                                <span class="badge bg-light text-primary">$${s.precio_regular}</span>
+                                <span class="badge bg-light text-primary">S/ ${s.precio_regular}</span>
                                 <span class="badge ${s.estado === 'Activo' ? 'bg-success' : 'bg-secondary'} ms-1">${s.estado}</span>
                             </div>
                             <div class="d-flex gap-2">
-                                <button class="btn btn-sm btn-light flex-grow-1">Editar</button>
+                                <button class="btn btn-sm btn-light flex-grow-1" onclick="openProductModal(${JSON.stringify(s).replace(/"/g, '&quot;')})">Editar</button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteProduct(${s.id})"><i class="fas fa-trash"></i></button>
                             </div>
                         </div>
                     </div>
                 `).join('')}
             </div>
+
+            <!-- MODAL DE PRODUCTO -->
+            <div class="modal fade" id="productFormModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content rounded-4 border-0">
+                        <div class="modal-header border-0 pb-0">
+                            <h5 class="fw-bold" id="productModalTitle">Nuevo Software</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form id="productForm">
+                            <input type="hidden" id="prodId">
+                            <div class="modal-body">
+                                <div class="row g-3">
+                                    <div class="col-md-8">
+                                        <label class="form-label small">Nombre del Sistema</label>
+                                        <input type="text" id="prodNombre" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small">Precio (S/)</label>
+                                        <input type="number" id="prodPrecio" class="form-control" step="0.01" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Categoría</label>
+                                        <select id="prodCategoria" class="form-select">
+                                            <option value="sistemas">Sistemas Empresariales</option>
+                                            <option value="web">Diseño Web</option>
+                                            <option value="movil">Apps Móviles</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Estado</label>
+                                        <select id="prodEstado" class="form-select">
+                                            <option value="Activo">Activo</option>
+                                            <option value="Inactivo">Inactivo</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small">Imagen del Producto</label>
+                                        <div class="input-group">
+                                            <input type="file" id="prodFile" class="form-control" accept="image/*">
+                                            <input type="text" id="prodImagen" class="form-control" placeholder="O pega una URL externa..." style="width: 40%;">
+                                        </div>
+                                        <div id="uploadStatus" class="small text-muted mt-1"></div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small">Descripción</label>
+                                        <textarea id="prodDesc" class="form-control" rows="3"></textarea>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small">URL Demo</label>
+                                        <input type="text" id="prodDemo" class="form-control">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small">URL Video (Vimeo/YT)</label>
+                                        <input type="text" id="prodVideo" class="form-control">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small fw-bold text-primary">Archivo de Entrega (URL de Descarga)</label>
+                                        <input type="text" id="prodDownload" class="form-control" placeholder="Link al zip, setup o proyecto final">
+                                        <div class="form-text small">Este link solo será visible para el cliente después de que actives su pago.</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-0 pt-0">
+                                <button type="submit" class="btn btn-primary px-4 rounded-pill">Guardar Cambios</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         `;
+
+        // Logic for opening modal
+        window.openProductModal = (product = null) => {
+            const modal = new bootstrap.Modal(document.getElementById('productFormModal'));
+            const form = document.getElementById('productForm');
+            form.reset();
+            
+            if (product) {
+                document.getElementById('productModalTitle').textContent = "Editar Software";
+                document.getElementById('prodId').value = product.id;
+                document.getElementById('prodNombre').value = product.nombre_sistema;
+                document.getElementById('prodPrecio').value = product.precio_regular;
+                document.getElementById('prodCategoria').value = product.categoria || 'sistemas';
+                document.getElementById('prodEstado').value = product.estado || 'Activo';
+                document.getElementById('prodImagen').value = product.url_imagen || '';
+                document.getElementById('prodDesc').value = product.descripcion || '';
+                document.getElementById('prodDemo').value = product.url_demo || '';
+                document.getElementById('prodVideo').value = product.url_video || '';
+                document.getElementById('prodDownload').value = product.url_descarga || '';
+            } else {
+                document.getElementById('productModalTitle').textContent = "Nuevo Software";
+                document.getElementById('prodId').value = "";
+            }
+            modal.show();
+        };
+
+        const productForm = document.getElementById('productForm');
+        productForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = productForm.querySelector('button[type="submit"]');
+            const fileInput = document.getElementById('prodFile');
+            const id = document.getElementById('prodId').value;
+            const statusEl = document.getElementById('uploadStatus');
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
+
+            try {
+                let imageUrl = document.getElementById('prodImagen').value;
+
+                // 1. Si hay un archivo seleccionado, subirlo primero
+                if (fileInput.files.length > 0) {
+                    statusEl.innerHTML = "Subiendo imagen...";
+                    const file = fileInput.files[0];
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+                    const filePath = `cat-${Date.now()}-${fileName}`;
+
+                    // Subir a bucket 'productos'
+                    const { data: uploadData, error: uploadError } = await supabaseClient
+                        .storage
+                        .from('productos')
+                        .upload(filePath, file);
+
+                    if (uploadError) throw new Error("Error subiendo imagen: " + uploadError.message);
+
+                    // Obtener URL Pública
+                    const { data: { publicUrl } } = supabaseClient
+                        .storage
+                        .from('productos')
+                        .getPublicUrl(filePath);
+                    
+                    imageUrl = publicUrl;
+                }
+
+                const data = {
+                    nombre_sistema: document.getElementById('prodNombre').value,
+                    precio_regular: parseFloat(document.getElementById('prodPrecio').value),
+                    categoria: document.getElementById('prodCategoria').value,
+                    estado: document.getElementById('prodEstado').value,
+                    url_imagen: imageUrl,
+                    descripcion: document.getElementById('prodDesc').value,
+                    url_demo: document.getElementById('prodDemo').value,
+                    url_video: document.getElementById('prodVideo').value,
+                    url_descarga: document.getElementById('prodDownload').value
+                };
+
+                if (id) {
+                    const { error } = await supabaseClient.from('software_venta').update(data).eq('id', id);
+                    if (error) throw error;
+                } else {
+                    const { error } = await supabaseClient.from('software_venta').insert(data);
+                    if (error) throw error;
+                }
+                
+                bootstrap.Modal.getInstance(document.getElementById('productFormModal')).hide();
+                renderCatalogo();
+            } catch (err) {
+                alert("Error al guardar: " + err.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Guardar Cambios";
+            }
+        });
+
+        // Logic for deleting
+        window.deleteProduct = async (id) => {
+            if (!confirm("¿Seguro que quieres eliminar este producto?")) return;
+            const { error } = await supabaseClient.from('software_venta').delete().eq('id', id);
+            if (error) alert("Error: " + error.message);
+            else renderCatalogo();
+        };
     }
 
     // ==========================================
@@ -736,6 +932,93 @@
             alert("Error: " + error.message);
         }
     };
+
+    // ==========================================
+    // LÓGICA DE CHAT PARA ADMINISTRADOR
+    // ==========================================
+    let activeChatId = null;
+    let adminSubscription = null;
+
+    window.openAdminChat = async (ticketId, title) => {
+        activeChatId = ticketId;
+        document.getElementById('chatTitleAdmin').textContent = "Soporte: " + title;
+        
+        const modal = new bootstrap.Modal(document.getElementById('chatModalAdmin'));
+        modal.show();
+
+        const container = document.getElementById('chatMessagesAdmin');
+        container.innerHTML = '<div class="text-center py-5"><div class="spinner-border spinner-border-sm me-2"></div>Abriendo canal...</div>';
+
+        // 1. Cargar mensajes
+        const { data: messages } = await supabaseClient
+            .from('mensajes_ticket')
+            .select('*')
+            .eq('ticket_id', ticketId)
+            .order('fecha', { ascending: true });
+
+        renderAdminMessages(messages || []);
+
+        // 2. Realtime
+        if (adminSubscription) supabaseClient.removeChannel(adminSubscription);
+        
+        adminSubscription = supabaseClient
+            .channel('admin:messages')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'mensajes_ticket', filter: `ticket_id=eq.${ticketId}` }, payload => {
+                appendAdminMessage(payload.new);
+            })
+            .subscribe();
+    };
+
+    function renderAdminMessages(msgs) {
+        const container = document.getElementById('chatMessagesAdmin');
+        if (msgs.length === 0) {
+            container.innerHTML = '<div class="text-center text-muted py-5 small">No hay mensajes.</div>';
+            return;
+        }
+        container.innerHTML = msgs.map(m => createAdminMsgHtml(m)).join('');
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function createAdminMsgHtml(m) {
+        const isMe = m.usuario_id === session.user.id;
+        return `
+            <div style="max-width: 80%; padding: 10px 15px; border-radius: 12px; font-size: 13px; shadow-sm; ${isMe ? 'align-self: flex-end; background: #212529; color: white;' : 'align-self: flex-start; background: #e9ecef; color: #000;'}">
+                ${m.mensaje}
+                <div style="font-size: 9px; opacity: 0.6; text-align: right; margin-top: 3px;">${new Date(m.fecha).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+            </div>
+        `;
+    }
+
+    function appendAdminMessage(m) {
+        const container = document.getElementById('chatMessagesAdmin');
+        const empty = container.querySelector('.text-center');
+        if (empty) empty.remove();
+        container.insertAdjacentHTML('beforeend', createAdminMsgHtml(m));
+        container.scrollTop = container.scrollHeight;
+    }
+
+    document.addEventListener('submit', async (e) => {
+        if (e.target && e.target.id === 'chatFormAdmin') {
+            e.preventDefault();
+            const input = document.getElementById('chatInputAdmin');
+            const val = input.value.trim();
+            if (!val || !activeChatId) return;
+
+            console.log("Admin enviando mensaje...");
+            input.value = '';
+            const { error } = await supabaseClient.from('mensajes_ticket').insert({
+                ticket_id: parseInt(activeChatId),
+                usuario_id: session.user.id,
+                mensaje: val
+            });
+
+            if (error) {
+                console.error("Error enviando respuesta admin:", error);
+                alert("Error al enviar respuesta: " + error.message);
+                input.value = val;
+            }
+        }
+    });
 
     // Iniciar con el dashboard
     renderModule('inicio');

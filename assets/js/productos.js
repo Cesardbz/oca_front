@@ -45,11 +45,56 @@ const modalGithub = document.getElementById('modalGithub');
 document.addEventListener('DOMContentLoaded', init);
 
 async function init() {
-  await loadProducts();
-  applyFilter('all');
-  initFilters();
-  initLoadMore();
-  initLightbox();
+  // Esperar a que supabaseClient esté disponible (cargado dinámicamente)
+  const checkSupabase = setInterval(async () => {
+    if (window.supabaseClient) {
+      clearInterval(checkSupabase);
+      await loadProducts();
+      applyFilter('all');
+      initFilters();
+      initLoadMore();
+      initLightbox();
+      refreshIsotope(); // Nueva función para refrescar el layout
+    }
+  }, 100);
+}
+
+// Función para que Isotope reconozca los nuevos elementos dinámicos
+function refreshIsotope() {
+  const container = document.querySelector('.portfolio-container');
+  if (container && window.jQuery && $.fn.isotope) {
+      const $grid = $(container).isotope({
+          itemSelector: '.portfolio-item',
+          layoutMode: 'fitRows',
+          transitionDuration: '0.4s'
+      });
+      
+      $grid.isotope('reloadItems').isotope({ sortBy: 'original-order' });
+      
+      // Forzar relayout cuando las imágenes carguen
+      $(container).find('img').on('load', function() {
+          $grid.isotope('layout');
+      });
+
+      // Relayout de seguridad tras medio segundo
+      setTimeout(() => $grid.isotope('layout'), 800);
+  }
+}
+
+// Función para transformar links de YouTube normales a formato embed
+function formatYoutubeUrl(url) {
+    if (!url) return '';
+    if (url.includes('youtube.com/embed/')) return url;
+
+    let videoId = '';
+    if (url.includes('youtu.be/')) {
+        videoId = url.split('youtu.be/')[1].split(/[?#]/)[0];
+    } else if (url.includes('youtube.com/watch')) {
+        const urlParams = new URLSearchParams(new URL(url).search);
+        videoId = urlParams.get('v');
+    }
+
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
 }
 
 // ==============================
@@ -58,10 +103,36 @@ async function init() {
 
 async function loadProducts() {
   try {
+    const { data: soft, error } = await supabaseClient
+      .from('software_venta')
+      .select('*')
+      .eq('estado', 'Activo')
+      .order('id', { ascending: false });
+
+    if (error) throw error;
+
+    // Mapeo de DB a UI con protecciones contra nulos
+    allProducts = soft.map(s => ({
+      id: s.id,
+      titulo: s.nombre_sistema || 'Sin nombre',
+      descripcion: (s.descripcion && s.descripcion !== 'null') ? s.descripcion : '',
+      categoria: s.categoria || 'sistemas',
+      imagen: (s.url_imagen && s.url_imagen !== 'null' && s.url_imagen !== '') ? s.url_imagen : 'assets/img/servicios/software-default.jpg',
+      video: s.url_video || '',
+      demo: s.url_demo || '',
+      precio: s.precio_regular || 0
+    }));
+
+    if (allProducts.length === 0) {
+        console.warn("Cargando productos desde JSON como fallback...");
+        const res = await fetch(PRODUCTS_URL);
+        allProducts = await res.json();
+    }
+  } catch (error) {
+    console.error('Error cargando productos desde Supabase:', error);
+    // Fallback opcional al JSON por si falla Supabase
     const res = await fetch(PRODUCTS_URL);
     allProducts = await res.json();
-  } catch (error) {
-    console.error('Error cargando productos:', error);
   }
 }
 
@@ -120,7 +191,7 @@ function createProductCard(product) {
   col.className = 'col-lg-4 col-md-6 col-12 portfolio-item';
 
   col.innerHTML = `
-    <div class="portfolio-wrap h-100">
+    <div class="portfolio-wrap">
       <figure>
         <img src="${product.imagen}" alt="${product.titulo}">
         
@@ -239,7 +310,7 @@ function openModal(product) {
   modalDescription.textContent = product.descripcion;
 
   // Video
-  modalVideo.src = product.video || '';
+  modalVideo.src = formatYoutubeUrl(product.video);
 
   // GitHub
   modalGithub.href = product.github || '#';

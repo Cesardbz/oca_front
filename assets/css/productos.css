@@ -99,14 +99,14 @@
 
 .portfolio-wrap {
   background: #fff;
-  border-radius: 16px; /* Más redondo, estilo app móvil */
+  border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  height: 100%;
   border: 1px solid rgba(0,0,0,0.02);
   display: flex;
   flex-direction: column;
+  height: auto; /* Permitir que la altura sea natural */
 }
 
 .portfolio-wrap:hover {
@@ -208,12 +208,13 @@
 /* ============================= */
 
 .portfolio-info {
-  padding: 25px 20px;
+  padding: 20px;
   text-align: center;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
+  min-height: 140px; /* Reducido un poco para que no quede muy vacío si hay poco texto */
 }
 
 .portfolio-info h4 {

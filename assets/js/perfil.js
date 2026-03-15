@@ -151,13 +151,24 @@
             const lic = licenses.find(l => l.software_id === s.software_id);
             const claveDisplay = lic ? `<code class="small text-primary">${lic.clave_licencia}</code>` : `<span class="text-muted small">Pendiente</span>`;
 
+            // Lógica de descarga
+            let downloadLink = '';
+            if (s.estado === 'Activo') {
+                const url = s.software_venta?.url_descarga || s.planes_web?.url_proyecto;
+                if (url) {
+                    downloadLink = `<a href="${url}" target="_blank" class="btn btn-sm btn-primary rounded-pill"><i class="fas fa-download me-1"></i>Descargar</a>`;
+                } else {
+                    downloadLink = `<span class="small text-muted">Listo para entrega</span>`;
+                }
+            }
+
             return `
                 <tr>
                     <td class="fw-bold">${nombre}</td>
                     <td>${new Date(s.fecha_compra).toLocaleDateString()}</td>
-                    <td>${s.proximo_vencimiento ? new Date(s.proximo_vencimiento).toLocaleDateString() : 'N/A'}</td>
                     <td><span class="badge ${s.estado === 'Activo' ? 'bg-success' : 'bg-secondary'}">${s.estado}</span></td>
                     <td>${claveDisplay}</td>
+                    <td>${downloadLink}</td>
                 </tr>
             `;
         }).join('');
@@ -212,7 +223,7 @@
                     <h6 class="mb-1 fw-bold">${t.asunto || t.tipo_servicio}</h6>
                     <p class="small text-muted mb-0">Estado: <span class="badge ${t.estado === 'Abierto' ? 'bg-primary' : 'bg-success'}">${t.estado}</span> • ${new Date(t.fecha_creacion).toLocaleDateString()}</p>
                 </div>
-                <button class="btn btn-outline-primary btn-sm">Ver Chat</button>
+                <button class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="openChat('${t.id}', '${t.asunto || t.tipo_servicio}')">Ver Chat</button>
             </div>
         `).join('');
     }
@@ -288,6 +299,107 @@
             }
         });
     }
+
+    // ==========================================
+    // LÓGICA DE CHAT EN TIEMPO REAL
+    // ==========================================
+    let currentTicketId = null;
+    let chatSubscription = null;
+
+    window.openChat = async (ticketId, title) => {
+        currentTicketId = ticketId;
+        document.getElementById('chatTitle').textContent = title;
+        const msgContainer = document.getElementById('chatMessages');
+        msgContainer.innerHTML = '<div class="text-center text-muted py-5"><div class="spinner-border spinner-border-sm me-2"></div>Cargando...</div>';
+        
+        const myModal = new bootstrap.Modal(document.getElementById('chatModal'));
+        myModal.show();
+
+        // 1. Cargar mensajes históricos
+        const { data: messages, error } = await supabaseClient
+            .from('mensajes_ticket')
+            .select('*')
+            .eq('ticket_id', ticketId)
+            .order('fecha', { ascending: true });
+
+        if (error) {
+            console.error("Error cargando mensajes:", error);
+            msgContainer.innerHTML = '<div class="text-danger p-3">Error al cargar chat.</div>';
+            return;
+        }
+
+        renderMessages(messages);
+
+        // 2. Suscribirse a nuevos mensajes (Realtime)
+        if (chatSubscription) supabaseClient.removeChannel(chatSubscription);
+        
+        chatSubscription = supabaseClient
+            .channel('public:mensajes_ticket')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'mensajes_ticket', filter: `ticket_id=eq.${ticketId}` }, payload => {
+                console.log('Nuevo mensaje recibido:', payload.new);
+                appendSingleMessage(payload.new);
+            })
+            .subscribe();
+    };
+
+    function renderMessages(messages) {
+        const container = document.getElementById('chatMessages');
+        if (messages.length === 0) {
+            container.innerHTML = '<div class="text-center text-muted py-5 small">No hay mensajes aún. ¡Inicia la conversación!</div>';
+            return;
+        }
+        container.innerHTML = messages.map(m => createMessageHtml(m)).join('');
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function createMessageHtml(m) {
+        const isMe = m.usuario_id === userId;
+        return `
+            <div class="msg ${isMe ? 'msg-me' : 'msg-other'} shadow-sm">
+                ${m.mensaje}
+                <div style="font-size: 10px; opacity: 0.7; text-align: right; margin-top: 4px;">
+                    ${new Date(m.fecha).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
+            </div>
+        `;
+    }
+
+    function appendSingleMessage(m) {
+        const container = document.getElementById('chatMessages');
+        const emptyState = container.querySelector('.text-center');
+        if (emptyState) emptyState.remove();
+        
+        container.insertAdjacentHTML('beforeend', createMessageHtml(m));
+        container.scrollTop = container.scrollHeight;
+    }
+
+    document.addEventListener('submit', async (e) => {
+        if (e.target && e.target.id === 'chatForm') {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text || !currentTicketId) return;
+
+            console.log("Enviando mensaje para ticket:", currentTicketId);
+            input.value = '';
+            
+            const { error } = await supabaseClient
+                .from('mensajes_ticket')
+                .insert({
+                    ticket_id: parseInt(currentTicketId),
+                    usuario_id: userId,
+                    mensaje: text
+                });
+
+            if (error) {
+                console.error("Error Supabase al enviar mensaje:", error);
+                alert("Error al enviar: " + (error.message || "Revisa si tienes activadas las políticas RLS en Supabase"));
+                input.value = text; // Devolver el texto si falló
+            } else {
+                console.log("Mensaje enviado con éxito");
+            }
+        }
+    });
 
     // Iniciar Dashboard inmediatamente
     initDashboard();
