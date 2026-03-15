@@ -13,6 +13,7 @@ class PaymentRequest(BaseModel):
     product_type: str # 'software' o 'plan'
     amount: float
     method: str
+    comprobante_url: Optional[str] = None
 
 class ActivationRequest(BaseModel):
     payment_id: int
@@ -27,8 +28,7 @@ async def process_payment(request: PaymentRequest):
         # 1. Registrar el servicio adquirido
         service_data = {
             "usuario_id": request.user_id,
-            "estado": "En espera",
-            "tipo": request.product_type
+            "estado": "En espera"
         }
         
         if request.product_type == "software":
@@ -43,7 +43,8 @@ async def process_payment(request: PaymentRequest):
             "usuario_id": request.user_id,
             "monto": request.amount,
             "estado_pago": "Pendiente",
-            "metodo_pago": request.method
+            "metodo_pago": request.method,
+            "comprobante_url": request.comprobante_url
         }
         payment_res = supabase.table("pagos").insert(payment_data).execute()
 

@@ -10,7 +10,7 @@
     const toggleSidebar = document.getElementById('toggleSidebar');
     const adminSidebar = document.getElementById('adminSidebar');
 
-    const apiUrl = window.location.hostname === 'localhost' ? 'http://localhost:8000/api' : 'https://tu-app.onrender.com/api';
+    const apiUrl = window.location.hostname === 'localhost' ? 'http://localhost:8000/api' : 'https://oca-backend.onrender.com/api';
 
     // 1. Verificar Sesión y Rol de Admin
     const { data: { session }, error: authError } = await supabaseClient.auth.getSession();

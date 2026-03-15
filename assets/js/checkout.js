@@ -5,7 +5,7 @@
 
 window.Checkout = {
     currentConfig: null,
-    apiUrl: window.location.hostname === 'localhost' ? 'http://localhost:8000/api' : 'https://tu-app.onrender.com/api',
+    apiUrl: window.location.hostname === 'localhost' ? 'http://localhost:8000/api' : 'https://oca-backend.onrender.com/api',
 
     init() {
         if (!document.getElementById('checkoutModal')) {
@@ -45,7 +45,11 @@ window.Checkout = {
                             <div id="details-BCP" class="payment-details d-none p-3 border rounded-3 mb-3">
                                 <p class="small mb-2"><strong>Cuenta Corriente BCP:</strong> 123-456789-0-12</p>
                                 <p class="small mb-2"><strong>CCI:</strong> 002-123456789012-00</p>
-                                <p class="small mb-0"><strong>Titular:</strong> OCA Digital Solutions</p>
+                                <p class="small mb-3"><strong>Titular:</strong> OCA Digital Solutions</p>
+                                
+                                <label class="form-label small fw-bold mt-2">Adjuntar Comprobante (Opcional):</label>
+                                <input type="file" id="comprobanteFile" class="form-control form-control-sm" accept="image/*">
+                                <div class="form-text small" style="font-size: 0.75rem;">Sube una captura de tu transferencia o Yape.</div>
                             </div>
 
                             <!-- DIV DETALLES PAYPAL -->
@@ -120,14 +124,37 @@ window.Checkout = {
 
         try {
             const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) throw new Error("Debes iniciar sesión para realizar una compra.");
             const userId = session.user.id;
+
+            let comprobanteUrl = null;
+            const fileInput = document.getElementById('comprobanteFile');
+            
+            // 1. Si hay archivo, subirlo a Supabase Storage
+            if (this.selectedMethod === 'BCP' && fileInput && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${userId}_${Date.now()}.${fileExt}`;
+                const filePath = `comprobantes/${fileName}`; // Carpeta interna
+
+                const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                    .from('comprobantes')
+                    .upload(filePath, file);
+
+                if (uploadError) throw new Error("Error al subir imagen: " + uploadError.message);
+                
+                // Obtener URL pública
+                const { data: { publicUrl } } = supabaseClient.storage.from('comprobantes').getPublicUrl(filePath);
+                comprobanteUrl = publicUrl;
+            }
 
             const payload = {
                 user_id: userId,
                 product_id: this.currentConfig.id,
                 product_type: this.currentConfig.type,
                 amount: this.currentConfig.price,
-                method: this.selectedMethod === 'BCP' ? 'Transferencia BCP' : 'PayPal'
+                method: this.selectedMethod === 'BCP' ? 'Transferencia BCP' : 'PayPal',
+                comprobante_url: comprobanteUrl
             };
 
             const response = await fetch(`${this.apiUrl}/payments/process`, {
