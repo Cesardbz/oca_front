@@ -8,7 +8,6 @@ function showToast(message, type = "success") {
     }, 2500);
 }
 
-
 const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
 
@@ -28,70 +27,110 @@ goLogin.addEventListener("click", (e) => {
     loginForm.classList.add("active");
 });
 
-/* CARGA DE USUARIOS */
-async function loadUsers() {
-    let users = localStorage.getItem("users");
+/* FUNCIÓN PARA REDIRECCIONAR SEGÚN ROL */
+async function redirectByUserRole(userId) {
+    try {
+        console.log("Verificando rol para el ID:", userId);
+        
+        const { data, error } = await supabaseClient
+            .from('usuarios')
+            .select('rol, nombre_completo')
+            .eq('id', userId)
+            .single();
 
-    if (users) {
-        return JSON.parse(users);
+        if (error) {
+            console.warn("No se encontró perfil en la tabla 'usuarios' (aún). Redirigiendo a inicio...");
+            window.location.href = "index.html";
+            return;
+        }
+
+        console.log("Usuario encontrado:", data);
+
+        if (data.rol === 'admin') {
+            console.log("¡Es Admin! Redirigiendo al dashboard...");
+            window.location.href = "admin/dashboard.html";
+        } else {
+            console.log("Es Cliente. Redirigiendo a inicio...");
+            window.location.href = "index.html";
+        }
+    } catch (err) {
+        console.error("Error crítico en redirección:", err);
+        window.location.href = "index.html";
     }
-
-    const response = await fetch("data/users.json");
-    users = await response.json();
-    localStorage.setItem("users", JSON.stringify(users));
-    return users;
 }
 
-/* LOGIN */
+/* LOGIN CON SUPABASE */
 loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const email = loginEmail.value.trim();
-    const password = loginPassword.value.trim();
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value.trim();
+    const btn = loginForm.querySelector('button');
+    const originalText = btn.textContent;
 
-    const users = await loadUsers();
-    const user = users.find(u => u.email === email && u.password === password);
+    try {
+        btn.disabled = true;
+        btn.textContent = "Validando...";
 
-    if (!user) {
-        showToast("Correo o contraseña incorrectos", "error");
-        return;
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email,
+            password,
+        });
+
+        if (error) throw error;
+
+        showToast("¡Bienvenido de nuevo!", "success");
+        
+        // Pequeño delay para asegurar que la sesión se guarde bien
+        setTimeout(() => {
+            redirectByUserRole(data.user.id);
+        }, 800);
+
+    } catch (error) {
+        console.error("Error login:", error);
+        showToast("Error: Correo o contraseña incorrectos", "error");
+    } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
     }
-
-    localStorage.setItem("session", JSON.stringify(user));
-    showToast("Inicio de sesión exitoso", "success");
-
-    setTimeout(() => {
-        window.location.href = "index.html";
-    }, 1500);
 });
 
 
-/* REGISTRO */
+/* REGISTRO CON SUPABASE */
 registerForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const users = await loadUsers();
+    const name = document.getElementById("registerName").value.trim();
+    const email = document.getElementById("registerEmail").value.trim();
+    const password = document.getElementById("registerPassword").value.trim();
+    const btn = registerForm.querySelector('button');
+    const originalText = btn.textContent;
 
-    if (users.some(u => u.email === registerEmail.value)) {
-        showToast("Este correo ya está registrado", "error");
-        return;
+    try {
+        btn.disabled = true;
+        btn.textContent = "Creando cuenta...";
+
+        const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+            email,
+            password,
+            options: {
+                data: { full_name: name }
+            }
+        });
+
+        if (authError) throw authError;
+
+        showToast("Registro exitoso. ¡Iniciando!", "success");
+        
+        setTimeout(() => {
+            window.location.href = "index.html";
+        }, 2000);
+
+    } catch (error) {
+        console.error("Error registro:", error);
+        showToast(error.message, "error");
+    } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
     }
-
-    const newUser = {
-        id: Date.now(),
-        nombre: registerName.value,
-        email: registerEmail.value,
-        password: registerPassword.value
-    };
-
-    users.push(newUser);
-    localStorage.setItem("users", JSON.stringify(users));
-    localStorage.setItem("session", JSON.stringify(newUser));
-
-    showToast("Registro exitoso", "success");
-
-    setTimeout(() => {
-        window.location.href = "index.html";
-    }, 1500);
 });
-

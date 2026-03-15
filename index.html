@@ -209,7 +209,7 @@
                 <h2 class="fw-bold mb-4">Hablemos sobre tu próxima gran idea</h2>
                 <p class="text-muted mb-4 pb-2">Llena el formulario y envíanos tu consulta. Un especialista de nuestro equipo te contactará lo más pronto posible para brindarte asesoría gratuita.</p>
                 
-                <form>
+                <form id="mainContactForm">
                     <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-floating">
@@ -279,12 +279,28 @@
     .then(data => {
         document.getElementById('header-components').innerHTML = data;
 
-        const script = document.createElement('script');
-        script.src = 'assets/js/common.js';
-        script.onload = () => {
-            initUserSession();
+        // Cargar scripts en orden
+        const scripts = [
+            'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+            'assets/js/supabase-client.js',
+            'assets/js/common.js'
+        ];
+
+        let index = 0;
+        const loadNextScript = () => {
+            if (index < scripts.length) {
+                const script = document.createElement('script');
+                script.src = scripts[index];
+                script.onload = () => {
+                    index++;
+                    loadNextScript();
+                };
+                document.body.appendChild(script);
+            } else {
+                if (typeof initUserSession === 'function') initUserSession();
+            }
         };
-        document.body.appendChild(script);
+        loadNextScript();
     })
     .catch(err => console.error('Error cargando header: ', err));
 

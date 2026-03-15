@@ -174,17 +174,26 @@
             .then(data => {
                 document.getElementById('header-components').innerHTML = data;
 
-                // Lista de scripts a cargar después del header
+                // Lista de scripts a cargar con orden de dependencia
                 const scriptsToLoad = [
+                    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+                    'assets/js/supabase-client.js',
                     'assets/js/common.js'
                 ];
 
-                scriptsToLoad.forEach(src => {
-                    const script = document.createElement('script');
-                    script.src = src;
-                    script.defer = true;
-                    document.body.appendChild(script);
-                });
+                let idx = 0;
+                function loadScripts() {
+                    if (idx < scriptsToLoad.length) {
+                        const script = document.createElement('script');
+                        script.src = scriptsToLoad[idx];
+                        script.onload = () => {
+                            idx++;
+                            loadScripts();
+                        };
+                        document.body.appendChild(script);
+                    }
+                }
+                loadScripts();
             });
 
         // Cargar footer

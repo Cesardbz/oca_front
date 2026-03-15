@@ -7,7 +7,8 @@
     "imagen": "assets/img/productos/imagen3.png",
     "video": "https://player.vimeo.com/video/676247342",
     "github": "https://github.com/oca/asistencia-qr",
-    "demo": "https://demo.ocaweb.com/tienda"
+    "demo": "https://demo.ocaweb.com/tienda",
+    "precio": 450.00
     },
     {
     "id": 2,
@@ -17,56 +18,51 @@
     "imagen": "assets/img/productos/imagen1.png",
     "video": "https://player.vimeo.com/video/676247342",
     "github": "https://github.com/oca/web-corporativa",
-    "demo": "https://demo.ocaweb.com/tienda"
+    "demo": "https://demo.ocaweb.com/tienda",
+    "precio": 800.00
     },
     {
     "id": 3,
-    "titulo": "Aplicacion de Soporte Técnico",
+    "titulo": "Soporte Técnico Especializado",
     "descripcion": "Mantenimiento preventivo y correctivo de equipos.",
     "categoria": "movil",
     "imagen": "assets/img/productos/imagen3.png",
     "video": "https://player.vimeo.com/video/676247342",
     "github": "",
-    "demo": "https://demo.ocaweb.com/tienda"
+    "demo": "https://demo.ocaweb.com/tienda",
+    "precio": 150.00
     },
     {
     "id": 4,
-    "titulo": "Tienda Virtual",
+    "titulo": "Tienda Virtual Pro",
     "descripcion": "E-commerce con carrito de compras y pasarela de pago.",
     "categoria": "web",
     "imagen": "assets/img/productos/imagen1.png",
     "video": "https://player.vimeo.com/video/676247342",
     "github": "https://github.com/oca/tienda-virtual",
-    "demo": "https://demo.ocaweb.com/tienda"
+    "demo": "https://demo.ocaweb.com/tienda",
+    "precio": 1200.00
     },
     {
     "id": 5,
-    "titulo": "Sistema de Inventario",
-    "descripcion": "Gestión de productos, stock y reportes.",
+    "titulo": "Sistema de Inventario QR",
+    "descripcion": "Gestión de productos, stock y reportes en tiempo real.",
     "categoria": "sistemas",
     "imagen": "assets/img/productos/imagen2.png",
     "video": "https://player.vimeo.com/video/676247342",
     "github": "",
-    "demo": "https://demo.ocaweb.com/tienda"
+    "demo": "https://demo.ocaweb.com/tienda",
+    "precio": 600.00
     },
     {
     "id": 6,
-    "titulo": "Aplicacion de Soporte Técnico",
-    "descripcion": "Mantenimiento preventivo y correctivo de equipos.",
+    "titulo": "App Móvil de Delivery",
+    "descripcion": "Solución completa para reparto y gestión de pedidos.",
     "categoria": "movil",
     "imagen": "assets/img/productos/imagen3.png",
     "video": "https://player.vimeo.com/video/676247342",
     "github": "",
-    "demo": "https://demo.ocaweb.com/tienda"
-    },
-    {
-    "id": 7,
-    "titulo": "Aplicacion de Soporte Técnico",
-    "descripcion": "Mantenimiento preventivo y correctivo de equipos.",
-    "categoria": "movil",
-    "imagen": "assets/img/productos/imagen3.png",
-    "video": "https://player.vimeo.com/video/676247342",
-    "github": "",
-    "demo": "https://demo.ocaweb.com/tienda"
+    "demo": "https://demo.ocaweb.com/tienda",
+    "precio": 950.00
     }
 ]

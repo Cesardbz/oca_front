@@ -246,11 +246,26 @@
             .then(data => {
                 document.getElementById('header-components').innerHTML = data;
 
-                // Lista de scripts a cargar después del header
-                const script = document.createElement('script');
-                script.src = 'assets/js/common.js';
-                script.defer = true;
-                document.body.appendChild(script);
+                // Lista de scripts a cargar en orden
+                const scripts = [
+                    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+                    'assets/js/supabase-client.js',
+                    'assets/js/common.js'
+                ];
+
+                let index = 0;
+                const loadNextScript = () => {
+                    if (index < scripts.length) {
+                        const script = document.createElement('script');
+                        script.src = scripts[index];
+                        script.onload = () => {
+                            index++;
+                            loadNextScript();
+                        };
+                        document.body.appendChild(script);
+                    }
+                };
+                loadNextScript();
             })
             .catch(err => console.error('Error cargando header: ', err));
 

@@ -68,7 +68,8 @@
         </button>
         
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto align-items-center">
+            <!-- Menú Central -->
+            <ul class="navbar-nav mx-auto align-items-center">
                 <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>
                 <li class="nav-item"><a class="nav-link" href="productos.html">Productos</a></li>
                 <li class="nav-item dropdown">
@@ -84,6 +85,10 @@
                 </li>
                 <li class="nav-item"><a class="nav-link" href="nosotros.html">Nosotros</a></li>
                 <li class="nav-item"><a class="nav-link" href="#" id="navContactBtn">Contacto</a></li>
+            </ul>
+
+            <!-- Usuario / Login a la Derecha -->
+            <ul class="navbar-nav ms-auto align-items-center">
                 <li class="nav-item position-relative">
                     <a class="nav-link btn-login text-center" href="login.html" id="loginBtn">
                         <i class="fas fa-user me-2"></i>Iniciar Sesión
@@ -125,19 +130,19 @@
             <form id="contactForm">
                 <div class="mb-3">
                     <label class="form-label"><i class="fas fa-user me-1"></i>Nombre Completo</label>
-                    <input type="text" class="form-control" placeholder="Tu nombre" required>
+                    <input type="text" id="modal-nombre" class="form-control" placeholder="Tu nombre" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label"><i class="fas fa-envelope me-1"></i>Email</label>
-                    <input type="email" class="form-control" placeholder="tu@email.com" required>
+                    <input type="email" id="modal-email" class="form-control" placeholder="tu@email.com" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label"><i class="fas fa-phone me-1"></i>Teléfono</label>
-                    <input type="tel" class="form-control" placeholder="+51 999 999 999">
+                    <input type="tel" id="modal-telefono" class="form-control" placeholder="+51 999 999 999">
                 </div>
                 <div class="mb-3">
                     <label class="form-label"><i class="fas fa-tag me-1"></i>Asunto</label>
-                    <select class="form-control" required>
+                    <select id="modal-asunto" class="form-control" required>
                         <option value="">Selecciona una opción</option>
                         <option value="cotizacion">Solicitar Cotización</option>
                         <option value="informacion">Información de Productos</option>
@@ -147,7 +152,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label"><i class="fas fa-comment me-1"></i>Mensaje</label>
-                    <textarea class="form-control" id="comentario" rows="4" placeholder="Escribe tu mensaje aquí..." required></textarea>
+                    <textarea id="modal-comentario" class="form-control" rows="4" placeholder="Escribe tu mensaje aquí..." required></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary w-100">
                     <i class="fas fa-paper-plane me-2"></i>Enviar Mensaje

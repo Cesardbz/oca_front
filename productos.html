@@ -92,6 +92,10 @@
                         <a id="modalGithub" href="#" target="_blank" class="btn btn-dark">
                             <i class="fab fa-github me-2"></i>Repositorio
                         </a>
+
+                        <button id="modalBuy" class="btn btn-success fw-bold">
+                            <i class="fas fa-shopping-cart me-2"></i>Comprar Ahora
+                        </button>
                         
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                             Cerrar
@@ -118,18 +122,26 @@
         .then(data => {
             document.getElementById('header-components').innerHTML = data;
 
-            // Lista de scripts a cargar después del header
-            const scriptsToLoad = [
-                'assets/js/common.js',
-                'assets/js/nosotros.js'
+            // Lista de scripts a cargar en orden
+            const scripts = [
+                'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+                'assets/js/supabase-client.js',
+                'assets/js/common.js'
             ];
 
-            scriptsToLoad.forEach(src => {
-                const script = document.createElement('script');
-                script.src = src;
-                script.defer = true; // opcional pero recomendado
-                document.body.appendChild(script);
-            });
+            let index = 0;
+            const loadNextScript = () => {
+                if (index < scripts.length) {
+                    const script = document.createElement('script');
+                    script.src = scripts[index];
+                    script.onload = () => {
+                        index++;
+                        loadNextScript();
+                    };
+                    document.body.appendChild(script);
+                }
+            };
+            loadNextScript();
         });
 
     // Cargar footer

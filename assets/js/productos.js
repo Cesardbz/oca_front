@@ -128,31 +128,41 @@ function createProductCard(product) {
           <button class="btn-details w-100 rounded-pill fw-bold" title="Más información sobre el producto">
             <i class="fas fa-info-circle me-1"></i> Ver Info
           </button>
-          <a href="#contacto" class="btn-buy w-100 rounded-pill fw-bold" title="Adquirir este producto">
+          <button class="btn-buy w-100 rounded-pill fw-bold" title="Adquirir este producto">
             <i class="fas fa-shopping-cart me-1"></i> Comprar / Alquilar
-          </a>
+          </button>
         </div>
       </figure>
 
       <div class="portfolio-info">
         <h4>${product.titulo}</h4>
         <p>${product.descripcion}</p>
+        <div class="fw-bold text-primary mt-2">S/ ${product.precio || '0.00'}</div>
       </div>
     </div>
   `;
 
   // Eventos
-  const previewBtn = col.querySelector('.btn-preview');
-  if (previewBtn) {
-    previewBtn.addEventListener('click', () => openLightbox(product));
-  }
-
   const detailsBtn = col.querySelector('.btn-details');
   if (detailsBtn) {
     detailsBtn.addEventListener('click', () => openModal(product));
   }
 
-  // Evento al clic de la imagen para abrir lightbox (como reemplazo visual)
+  const buyBtn = col.querySelector('.btn-buy');
+  if (buyBtn) {
+    buyBtn.addEventListener('click', () => {
+        if (window.Checkout) {
+            window.Checkout.open({
+                type: 'software',
+                id: product.id,
+                name: product.titulo,
+                price: product.precio
+            });
+        }
+    });
+  }
+
+  // Evento al clic de la imagen para abrir lightbox
   const img = col.querySelector('img');
   if (img) {
     img.style.cursor = 'pointer';
@@ -240,6 +250,28 @@ function openModal(product) {
     modalDemo.style.display = 'inline-block';
   } else {
     modalDemo.style.display = 'none';
+  }
+
+  // Buy Button
+  const modalBuy = document.getElementById('modalBuy');
+  if (modalBuy) {
+    // Limpiar eventos anteriores (clonando)
+    const newBuyBtn = modalBuy.cloneNode(true);
+    modalBuy.parentNode.replaceChild(newBuyBtn, modalBuy);
+    
+    newBuyBtn.addEventListener('click', () => {
+        if (window.Checkout) {
+            window.Checkout.open({
+                type: 'software',
+                id: product.id,
+                name: product.titulo,
+                price: product.price || product.precio
+            });
+            // Opcional: cerrar el modal de info
+            const currentModal = bootstrap.Modal.getInstance(document.getElementById('productModal'));
+            if (currentModal) currentModal.hide();
+        }
+    });
   }
 
   const modal = new bootstrap.Modal(

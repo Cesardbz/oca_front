@@ -345,9 +345,16 @@ body {
 
 .tech-sphere {
     position: relative;
-    width: 500px;
-    height: 500px;
+    width: 100%;
+    max-width: 500px;
+    aspect-ratio: 1/1;
     transform-style: preserve-3d;
+}
+
+@media (max-width: 576px) {
+    .tech-sphere {
+        max-width: 300px;
+    }
 }
 
 .tech-center {

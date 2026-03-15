@@ -390,18 +390,27 @@
         .then(data => {
             document.getElementById('header-components').innerHTML = data;
 
-            // Lista de scripts a cargar después del header
-            const scriptsToLoad = [
+            // Lista de scripts a cargar en orden
+            const scripts = [
+                'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+                'assets/js/supabase-client.js',
                 'assets/js/common.js',
                 'assets/js/nosotros.js'
             ];
 
-            scriptsToLoad.forEach(src => {
-                const script = document.createElement('script');
-                script.src = src;
-                script.defer = true; // opcional pero recomendado
-                document.body.appendChild(script);
-            });
+            let index = 0;
+            const loadNextScript = () => {
+                if (index < scripts.length) {
+                    const script = document.createElement('script');
+                    script.src = scripts[index];
+                    script.onload = () => {
+                        index++;
+                        loadNextScript();
+                    };
+                    document.body.appendChild(script);
+                }
+            };
+            loadNextScript();
         });
 
     // Cargar footer
